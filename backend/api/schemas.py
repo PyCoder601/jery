@@ -30,7 +30,7 @@ class ServerData(BaseModel):
     is_verified: bool
     created_at: str
 
-    metrics: list["MetricData"]
+    metrics: list["MetricData"] = []
 
 
 class ServerRequestData(BaseModel):
@@ -43,3 +43,9 @@ class MetricData(BaseModel):
     current_level: float
     warning_level: float
     created_at: str
+
+
+class MetricRequestData(BaseModel):
+    name: str
+    current_level: float
+    warning_level: float

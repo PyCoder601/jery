@@ -1,6 +1,3 @@
-from datetime import timedelta
-
-from fast_jwt import FastJWT
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import select, or_
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -14,9 +11,9 @@ from backend.api.schemas import (
     UserLoginRequestData,
 )
 from backend.config.database import get_session
+from backend.config.jwt import jwt_auth
 
 router = APIRouter()
-jwt_auth = FastJWT(secret_key="secret_key", algorithm="HS256")
 
 
 @router.post("/user-signup", response_model=UserLoginResponseData)
@@ -46,13 +43,9 @@ async def user_signup(
     await async_session.commit()
     await async_session.refresh(new_user)
 
-    access_token = jwt_auth.create_access_token(
-        user_id=new_user.id, expires_delta=timedelta(minutes=30)
-    )
+    access_token = jwt_auth.create_access_token(user_id=new_user.id)
 
-    refresh_token = jwt_auth.create_refresh_token(
-        user_id=new_user.id, expires_delta=timedelta(days=1)
-    )
+    refresh_token = jwt_auth.create_refresh_token(user_id=new_user.id)
 
     response = JSONResponse(
         content={"access_token": access_token, "user": new_user},
@@ -84,13 +77,9 @@ async def user_login(
     if not verify_password(data.password, is_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid username or password.")
 
-    access_token = jwt_auth.create_access_token(
-        user_id=is_user.id, expires_delta=timedelta(minutes=30)
-    )
+    access_token = jwt_auth.create_access_token(user_id=is_user.id)
 
-    refresh_token = jwt_auth.create_refresh_token(
-        user_id=is_user.id, expires_delta=timedelta(days=1)
-    )
+    refresh_token = jwt_auth.create_refresh_token(user_id=is_user.id)
 
     response = JSONResponse(
         content={"access_token": access_token, "user": is_user},
@@ -105,4 +94,18 @@ async def user_login(
         max_age=3600 * 24,
     )
 
-    response = JSONResponse(content={"access_token": access_token, "user": is_user})
+    return response
+
+
+@router.post("/user-refresh-token")
+def user_refresh_token(new_tokens: dict = Depends(jwt_auth.refresh_token)):
+    response = JSONResponse(content=new_tokens, status_code=200)
+
+    response.set_cookie(
+        key="refresh_token",
+        value=new_tokens["refresh_token"],
+        httponly=True,
+        samesite="strict",
+        max_age=3600 * 24,
+    )
+    return response

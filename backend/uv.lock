@@ -76,7 +76,7 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "bcrypt", specifier = "<4.1.0" },
     { name = "black", specifier = ">=25.1.0" },
-    { name = "fast-jwt-auth", specifier = ">=0.1.6" },
+    { name = "fast-jwt-auth", specifier = ">=0.1.8" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.2" },
     { name = "passlib", specifier = ">=1.7.4" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
@@ -176,14 +176,14 @@ wheels = [
 
 [[package]]
 name = "fast-jwt-auth"
-version = "0.1.6"
+version = "0.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyjwt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3f/bc/e7c2947b2ab38284caf0d39384859b2a7f5ed8d937ecbe1acffc299d2452/fast_jwt_auth-0.1.6.tar.gz", hash = "sha256:61e11435c30e14e8016d23827161494938936268b793eada97f0b71cb6758fe0", size = 4743, upload-time = "2025-08-19T05:22:40.325Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/c6/293eab9fa325e02ab06750ea8d3cbc1f04b80e7045a05a880538f2a89b89/fast_jwt_auth-0.1.8.tar.gz", hash = "sha256:0632d3b18e1d46d7b5be733b876505f66e669b4aeea3e3ca429f68fd679f73f8", size = 4762, upload-time = "2025-09-22T06:04:58.139Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/de/75/9a0563edf47361f4222eb43d779ca09cba618c942a04bafbc44bbfc66f79/fast_jwt_auth-0.1.6-py3-none-any.whl", hash = "sha256:fd1d984e2d336463b9a4f107f59414f1f84813cee84dfebf4a6282ba1962e7cc", size = 4983, upload-time = "2025-08-19T05:22:38.653Z" },
+    { url = "https://files.pythonhosted.org/packages/37/54/3be99438abc5f2701b412addcee595b6f0c89d86d1352f84c6938b0dcbed/fast_jwt_auth-0.1.8-py3-none-any.whl", hash = "sha256:a9178d4b172e99a15882192135c2a9961efaaa2c44c9f87cd6de3991cb4712ad", size = 4999, upload-time = "2025-09-22T06:04:57.059Z" },
 ]
 
 [[package]]
