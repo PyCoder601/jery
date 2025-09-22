@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -46,6 +48,5 @@ class MetricData(BaseModel):
 
 
 class MetricRequestData(BaseModel):
-    name: str
-    current_level: float
-    warning_level: float
+    name: Optional[str] = None
+    warning_level: Optional[float] = None

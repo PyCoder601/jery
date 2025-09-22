@@ -36,7 +36,7 @@ class Server(SQLModel, table=True):
 class Metric(SQLModel, table=True):
     id: int = Field(primary_key=True, index=True)
     name: str = Field(nullable=False)
-    current_level: float = Field(nullable=False)
+    current_level: float = Field(default=0.0)
     warning_level: float = Field(nullable=False)
     created_at: datetime = Field(default_factory=datetime.now)
 
