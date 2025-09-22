@@ -22,6 +22,7 @@ class Server(SQLModel, table=True):
     name: str = Field(nullable=False)
     api_key: str = Field(nullable=False, index=True)
     is_verified: bool = Field(default=False)
+    top_five_processes: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.now)
 
     owner_id: int = Field(foreign_key="user.id", nullable=False)

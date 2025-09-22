@@ -3,15 +3,15 @@ from sqlmodel import select, or_
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse
 
-from backend.api.helpers import hash_password, verify_password
-from backend.api.models import User
-from backend.api.schemas import (
+from .helpers import hash_password, verify_password
+from .models import User
+from .schemas import (
     UserSignupRequestData,
     UserLoginResponseData,
     UserLoginRequestData,
 )
-from backend.config.database import get_session
-from backend.config.jwt import jwt_auth
+from config.database import get_session
+from config.jwt import jwt_auth
 
 router = APIRouter()
 

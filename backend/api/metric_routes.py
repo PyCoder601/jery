@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from backend.api.models import Server, Metric
-from backend.api.schemas import MetricData, MetricRequestData
-from backend.config.database import get_session
-from backend.config.jwt import jwt_auth
+from .models import Server, Metric
+from .schemas import MetricData, MetricRequestData
+from config.database import get_session
+from config.jwt import jwt_auth
 
 router = APIRouter()
 

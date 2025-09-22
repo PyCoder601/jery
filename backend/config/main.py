@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from api import auth_routes, server_routes, metric_routes
+
 load_dotenv()
 
 app = FastAPI()
@@ -15,3 +17,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_routes.router, prefix="/api")
+app.include_router(server_routes.router, prefix="/api")
+app.include_router(metric_routes.router, prefix="/api")

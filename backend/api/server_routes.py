@@ -5,11 +5,11 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from backend.api.helpers import generate_api_key
-from backend.api.models import Server
-from backend.api.schemas import ServerRequestData, ServerData
-from backend.config.database import get_session
-from backend.config.jwt import jwt_auth
+from .helpers import generate_api_key
+from .models import Server
+from .schemas import ServerRequestData, ServerData
+from config.database import get_session
+from config.jwt import jwt_auth
 
 router = APIRouter()
 
