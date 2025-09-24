@@ -1,28 +1,43 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addHistory,
+  clearCommand,
+  clearHistory,
+  selectCommand,
+  selectHistory,
+} from "@/redux/uiSlice";
+import { AppDispatch } from "@/redux/store";
+
+const addHistoryLine = (text: string, isUserInput = false) => ({
+  text,
+  isUserInput,
+  timestamp: new Date().toLocaleTimeString(),
+});
 
 const lines = [
   { text: "Booting Jery Monitoring System...", delay: 100 },
   { text: "Version: 1.0.0-beta", delay: 150 },
   { text: "Status: Connected to server.", delay: 200 },
-  { text: "Type 'signup' to create an account.", delay: 100 },
-  { text: "Type 'login' to login.", delay: 100 },
-  { text: "Type 'about' to learn more.", delay: 100 },
 ];
 
-const TerminalUI = () => {
-  const [currentLines, setCurrentLines] = useState<{ text: string }[]>([]);
-  const [input, setInput] = useState("");
+export default function Home() {
+  const dispatch: AppDispatch = useDispatch();
+  const command = useSelector(selectCommand);
+  const history = useSelector(selectHistory);
   const router = useRouter();
+  const terminalEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    dispatch(clearHistory());
     let timeoutId: NodeJS.Timeout;
     const showLines = (index: number) => {
       if (index < lines.length) {
         timeoutId = setTimeout(() => {
-          setCurrentLines((prev) => [...prev, lines[index]]);
+          dispatch(addHistory(addHistoryLine(lines[index].text)));
           showLines(index + 1);
         }, lines[index].delay);
       }
@@ -31,17 +46,36 @@ const TerminalUI = () => {
     showLines(0);
 
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [dispatch]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      const command = input.toLowerCase().trim();
-      if (command === "signup") {
+  useEffect(() => {
+    terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [history]);
+
+  useEffect(() => {
+    if (!command) return;
+
+    const commandStr = command.toLowerCase().trim();
+    switch (commandStr) {
+      case "signup":
         router.push("/signup");
-      }
-      setInput("");
+        break;
+      case "login":
+        router.push("/login");
+        break;
+      case "about":
+        router.push("/about");
+        break;
+      default:
+        dispatch(
+          addHistory(
+            addHistoryLine(`Unknown command: ${commandStr}, check the bot for help`),
+          ),
+        );
+        break;
     }
-  };
+    dispatch(clearCommand());
+  }, [command, dispatch, router]);
 
   const colorizeText = (text: string) => {
     const wordsToColor = ["'signup'", "'login'", "'about'"];
@@ -62,27 +96,29 @@ const TerminalUI = () => {
 
   return (
     <div className="flex h-full flex-col font-mono text-sm text-green-400">
-      <div className="flex-grow">
-        {currentLines.map((line, index) => (
+      <div className="flex-grow overflow-y-auto pr-2">
+        {history.map((line, index) => (
           <motion.p
             key={index}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.1 }}
           >
-            <span className="mr-2 text-gray-400">{`[${new Date().toLocaleTimeString()}]>`}</span>
-            {colorizeText(line.text)}
+            {line.isUserInput ? (
+              <>
+                <span className="mr-2 text-gray-400">{`>`}</span>
+                <span>{line.text}</span>
+              </>
+            ) : (
+              <>
+                <span className="mr-2 text-gray-400">{`[${line.timestamp}]>`}</span>
+                {colorizeText(line.text)}
+              </>
+            )}
           </motion.p>
         ))}
+        <div ref={terminalEndRef} />
       </div>
     </div>
-  );
-};
-
-export default function Home() {
-  return (
-    <main className="h-full">
-      <TerminalUI />
-    </main>
   );
 }

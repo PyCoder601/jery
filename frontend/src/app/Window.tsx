@@ -1,8 +1,33 @@
-"use client";
-import React from "react";
-import { motion } from "framer-motion";
+'use client';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectInputValue,
+  setCommand,
+  setInputValue,
+  addHistory,
+} from '@/redux/uiSlice';
+import { AppDispatch } from '@/redux/store';
 
 const Window = ({ children }: { children: React.ReactNode }) => {
+  const inputValue: string = useSelector(selectInputValue);
+  const dispatch: AppDispatch = useDispatch();
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && inputValue.trim() !== '') {
+      dispatch(setCommand(inputValue));
+      dispatch(
+        addHistory({
+          text: inputValue,
+          isUserInput: true,
+          timestamp: new Date().toLocaleTimeString(),
+        }),
+      );
+      dispatch(setInputValue(''));
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -20,12 +45,15 @@ const Window = ({ children }: { children: React.ReactNode }) => {
           Jery - Server Monitoring
         </div>
       </div>
-      <div className="h-[calc(80vh-2.5rem)] p-6">
+      <div className="h-[calc(80vh-3.5rem)] p-6">
         {children}
         <div className="flex items-center">
           <span className="mr-2 text-gray-400">{`>`}</span>
           <input
             type="text"
+            value={inputValue}
+            onChange={(e) => dispatch(setInputValue(e.target.value))}
+            onKeyDown={handleKeyDown}
             className="flex-grow border-none bg-transparent text-green-400 focus:outline-none"
             autoFocus
           />
@@ -41,3 +69,4 @@ const Window = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default Window;
+
