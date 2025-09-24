@@ -11,12 +11,7 @@ import {
   selectHistory,
 } from "@/redux/uiSlice";
 import { AppDispatch } from "@/redux/store";
-
-const addHistoryLine = (text: string, isUserInput = false) => ({
-  text,
-  isUserInput,
-  timestamp: new Date().toLocaleTimeString(),
-});
+import { addHistoryLine } from "@/utils/helpes";
 
 const lines = [
   { text: "Booting Jery Monitoring System...", delay: 100 },
@@ -53,9 +48,9 @@ export default function Home() {
   }, [history]);
 
   useEffect(() => {
-    if (!command) return;
+    if (!command?.text) return;
 
-    const commandStr = command.toLowerCase().trim();
+    const commandStr = command.text?.toLowerCase().trim();
     switch (commandStr) {
       case "signup":
         router.push("/signup");
@@ -75,7 +70,7 @@ export default function Home() {
         break;
     }
     dispatch(clearCommand());
-  }, [command, dispatch, router]);
+  }, [command.text, dispatch, router]);
 
   const colorizeText = (text: string) => {
     const wordsToColor = ["'signup'", "'login'", "'about'"];

@@ -4,7 +4,7 @@ import { HistoryLine, UiState } from "@/utils/types";
 
 const initialState: UiState = {
   inputValue: "",
-  command: null,
+  command: { type: "text", text: null },
   history: [],
 };
 
@@ -16,10 +16,14 @@ const uiSlice = createSlice({
       state.inputValue = action.payload;
     },
     setCommand: (state, action: PayloadAction<string>) => {
-      state.command = action.payload;
+      console.log("Clearing command", state.command);
+      state.command.text = action.payload;
     },
     clearCommand: (state) => {
-      state.command = null;
+      state.command.text = null;
+    },
+    setCommandType: (state, action: PayloadAction<"text" | "password">) => {
+      state.command.type = action.payload;
     },
     addHistory: (state, action: PayloadAction<HistoryLine>) => {
       state.history.push(action.payload);
@@ -36,6 +40,7 @@ export const {
   clearCommand,
   addHistory,
   clearHistory,
+  setCommandType,
 } = uiSlice.actions;
 export default uiSlice.reducer;
 

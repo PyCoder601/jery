@@ -1,30 +1,27 @@
-'use client';
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useDispatch, useSelector } from 'react-redux';
+"use client";
+import React from "react";
+import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
 import {
   selectInputValue,
   setCommand,
   setInputValue,
   addHistory,
-} from '@/redux/uiSlice';
-import { AppDispatch } from '@/redux/store';
+  selectCommand,
+} from "@/redux/uiSlice";
+import { AppDispatch } from "@/redux/store";
+import { addHistoryLine } from "@/utils/helpes";
 
 const Window = ({ children }: { children: React.ReactNode }) => {
   const inputValue: string = useSelector(selectInputValue);
+  const curr_command = useSelector(selectCommand);
   const dispatch: AppDispatch = useDispatch();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && inputValue.trim() !== '') {
+    if (e.key === "Enter" && inputValue.trim() !== "") {
       dispatch(setCommand(inputValue));
-      dispatch(
-        addHistory({
-          text: inputValue,
-          isUserInput: true,
-          timestamp: new Date().toLocaleTimeString(),
-        }),
-      );
-      dispatch(setInputValue(''));
+      dispatch(addHistory(addHistoryLine(inputValue, true, curr_command.type)));
+      dispatch(setInputValue(""));
     }
   };
 
@@ -50,7 +47,7 @@ const Window = ({ children }: { children: React.ReactNode }) => {
         <div className="flex items-center">
           <span className="mr-2 text-gray-400">{`>`}</span>
           <input
-            type="text"
+            type={curr_command?.type}
             value={inputValue}
             onChange={(e) => dispatch(setInputValue(e.target.value))}
             onKeyDown={handleKeyDown}
@@ -69,4 +66,3 @@ const Window = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default Window;
-

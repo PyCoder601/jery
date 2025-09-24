@@ -1,12 +1,18 @@
 export interface HistoryLine {
+  type: "text" | "password";
   text: string;
   isUserInput: boolean;
   timestamp: string;
 }
 
+export interface CommandType {
+  type: "text" | "password";
+  text: string | null;
+}
+
 export interface UiState {
   inputValue: string;
-  command: string | null;
+  command: CommandType;
   history: HistoryLine[];
 }
 
