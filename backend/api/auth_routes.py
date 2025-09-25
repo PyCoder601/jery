@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import select, or_
 from sqlmodel.ext.asyncio.session import AsyncSession
-from starlette.responses import JSONResponse
+from fastapi.responses import JSONResponse
 
 from .helpers import hash_password, verify_password
 from .models import User
@@ -16,7 +16,7 @@ from config.jwt import jwt_auth
 router = APIRouter()
 
 
-@router.post("/user-signup", response_model=UserLoginResponseData)
+@router.post("/signup", response_model=UserLoginResponseData)
 async def user_signup(
     data: UserSignupRequestData, async_session: AsyncSession = Depends(get_session)
 ):
@@ -48,7 +48,16 @@ async def user_signup(
     refresh_token = jwt_auth.create_refresh_token(user_id=new_user.id)
 
     response = JSONResponse(
-        content={"access_token": access_token, "user": new_user},
+        content={
+            "access_token": access_token,
+            "user": {
+                "id": new_user.id,
+                "username": new_user.username,
+                "email": new_user.email,
+                "is_mail_verified": new_user.is_mail_verified,
+                "created_at": new_user.created_at.isoformat(),
+            },
+        },
         status_code=201,
     )
 
@@ -63,7 +72,7 @@ async def user_signup(
     return response
 
 
-@router.post("/user-login", response_model=UserLoginResponseData)
+@router.post("/login", response_model=UserLoginResponseData)
 async def user_login(
     data: UserLoginRequestData, async_session: AsyncSession = Depends(get_session)
 ):
@@ -72,17 +81,17 @@ async def user_login(
     is_user = user.one_or_none()
 
     if not is_user:
-        raise HTTPException(status_code=400, detail="User not found.")
+        raise HTTPException(status_code=401, detail="User not found.")
 
     if not verify_password(data.password, is_user.hashed_password):
-        raise HTTPException(status_code=400, detail="Invalid username or password.")
+        raise HTTPException(status_code=401, detail="Invalid username or password.")
 
     access_token = jwt_auth.create_access_token(user_id=is_user.id)
 
     refresh_token = jwt_auth.create_refresh_token(user_id=is_user.id)
 
     response = JSONResponse(
-        content={"access_token": access_token, "user": is_user},
+        content={"access_token": access_token, "user": is_user.model_dump()},
         status_code=200,
     )
 

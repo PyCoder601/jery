@@ -30,7 +30,7 @@ const Window = ({ children }: { children: React.ReactNode }) => {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className="mx-auto h-[80vh] w-full max-w-[75vw] rounded-lg border border-white/10 bg-[#1a202c]/60 shadow-2xl backdrop-blur-xl"
+      className="mx-auto h-[90vh] w-full max-w-[85vw] rounded-lg border border-white/10 bg-[#1a202c]/60 shadow-2xl backdrop-blur-xl"
     >
       <div className="flex h-10 w-full items-center border-b border-white/10 bg-gray-800/50 px-4">
         <div className="flex space-x-2">
@@ -42,7 +42,7 @@ const Window = ({ children }: { children: React.ReactNode }) => {
           Jery - Server Monitoring
         </div>
       </div>
-      <div className="h-[calc(80vh-3.5rem)] p-6">
+      <div className="h-[calc(90vh-3.5rem)] p-2">
         {children}
         <div className="flex items-center">
           <span className="mr-2 text-gray-400">{`>`}</span>

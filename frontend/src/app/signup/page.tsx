@@ -1,6 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addHistory,
@@ -13,6 +12,8 @@ import {
 import { AppDispatch } from "@/redux/store";
 import { UserSignupData } from "@/utils/types";
 import { addHistoryLine } from "@/utils/helpes";
+import { authenticate } from "@/services/auth";
+import AuthHistories from "@/components/AuthHistories";
 
 export default function SignupPage() {
   const dispatch: AppDispatch = useDispatch();
@@ -28,8 +29,6 @@ export default function SignupPage() {
     data: {},
   });
 
-  const terminalEndRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     dispatch(clearHistory());
     dispatch(setCommandType("text"));
@@ -38,13 +37,9 @@ export default function SignupPage() {
   }, [dispatch]);
 
   useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [history]);
-
-  useEffect(() => {
     if (!command?.text) return;
 
-    const handleCommand = () => {
+    const handleCommand = async () => {
       switch (workflow.step) {
         case "signup-email":
           setWorkflow({
@@ -70,16 +65,38 @@ export default function SignupPage() {
           break;
         case "signup-confirm-password":
           if (command.text === workflow.data.password) {
+            const res: true | number | null = await authenticate(
+              workflow.data as UserSignupData,
+              "signup",
+            );
+            if (res === 400) {
+              dispatch(addHistory(addHistoryLine("Email or username already exists.")));
+              setTimeout(() => window.location.reload(), 2000);
+              break;
+            }
+            if (res === 422) {
+              dispatch(
+                addHistory(addHistoryLine("Password is too short, min 8 characters.")),
+              );
+              break;
+            }
+            if (!res) {
+              dispatch(
+                addHistory(addHistoryLine("An error occurred. Please try again.")),
+              );
+              setTimeout(() => window.location.reload(), 2000);
+              break;
+            }
             dispatch(
               addHistory(addHistoryLine("Account created successfully! Redirecting...")),
             );
-            setTimeout(() => (window.location.href = "/"), 2000);
+            setTimeout(() => (window.location.href = "/account"), 2000);
           } else {
             dispatch(setCommandType("text"));
             dispatch(
               addHistory(addHistoryLine("Passwords do not match. Please start over.")),
             );
-            setTimeout(() => window.location.reload(), 2000);
+            setTimeout(() => window.location.reload(), 5000);
           }
           setWorkflow({ step: "done", data: {} });
           break;
@@ -92,33 +109,5 @@ export default function SignupPage() {
     handleCommand();
   }, [command, dispatch, workflow]);
 
-  return (
-    <main className="h-full font-mono text-sm text-green-400">
-      <div className="h-full overflow-y-auto pr-2">
-        {history.map((line, index) => (
-          <motion.p
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.1 }}
-          >
-            {line.isUserInput ? (
-              <>
-                <span className="mr-2 text-gray-400">{`>`}</span>
-                <span>
-                  {line.type === "password" ? "*".repeat(line.text.length) : line.text}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="mr-2 text-gray-400">{`[${line.timestamp}]>`}</span>
-                <span>{line.text}</span>
-              </>
-            )}
-          </motion.p>
-        ))}
-        <div ref={terminalEndRef} />
-      </div>
-    </main>
-  );
+  return <AuthHistories history={history} />;
 }

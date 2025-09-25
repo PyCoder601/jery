@@ -15,15 +15,17 @@ import { Persistor } from "redux-persist/es/types";
 import storageSession from "redux-persist/lib/storage/session";
 
 import uiReducer from "./uiSlice";
+import accountReducer from "./accountSlice";
 
 const rootReducer = combineReducers({
   ui: uiReducer,
+  account: accountReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage: storageSession,
-  whitelist: ["ui"],
+  whitelist: ["ui", "account"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -32,9 +34,8 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
+      serializableCheck: false,
+      immutableCheck: false,
     }),
 });
 

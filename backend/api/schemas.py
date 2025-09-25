@@ -31,7 +31,8 @@ class ServerData(BaseModel):
     api_key: str
     is_verified: bool
     created_at: str
-
+    owner_id: int
+    top_five_processes: Optional[str] = None
     metrics: list["MetricData"] = []
 
 

@@ -13,6 +13,8 @@ import {
 import { AppDispatch } from "@/redux/store";
 import { UserLoginData } from "@/utils/types";
 import { addHistoryLine } from "@/utils/helpes";
+import { authenticate } from "@/services/auth";
+import AuthHistories from "@/components/AuthHistories";
 
 export default function LoginPage() {
   const dispatch: AppDispatch = useDispatch();
@@ -41,20 +43,39 @@ export default function LoginPage() {
   useEffect(() => {
     if (!command?.text) return;
 
-    const handleCommand = () => {
+    const handleCommand = async () => {
       switch (workflow.step) {
         case "login-email":
           setWorkflow({
             step: "login-password",
-            data: { ...workflow.data, email: command.text as string },
+            data: { ...workflow.data, username: command.text as string },
           });
           dispatch(setCommandType("password"));
           dispatch(addHistory(addHistoryLine("Enter your password:")));
           break;
         case "login-password":
+          const res: true | number | null = await authenticate(
+            { ...workflow.data, password: command.text as string } as UserLoginData,
+            "login",
+          );
+          console.log("res", res);
+          if (res === 401) {
+            dispatch(addHistory(addHistoryLine("Invalid username or password.")));
+            break;
+          }
+          if (res === 422) {
+            dispatch(
+              addHistory(addHistoryLine("Password is too short, min 8 characters.")),
+            );
+            break;
+          }
+          if (!res) {
+            dispatch(addHistory(addHistoryLine("An error occurred. Please try again.")));
+            break;
+          }
           dispatch(setCommandType("text"));
           dispatch(addHistory(addHistoryLine("Login successful! Redirecting...")));
-          setTimeout(() => (window.location.href = "/"), 2000);
+          // setTimeout(() => (window.location.href = "/account"), 5000);
           setWorkflow({ step: "done", data: {} });
           break;
         default:
@@ -66,33 +87,5 @@ export default function LoginPage() {
     handleCommand();
   }, [command, dispatch, workflow]);
 
-  return (
-    <main className="h-full font-mono text-sm text-green-400">
-      <div className="h-full overflow-y-auto pr-2">
-        {history.map((line, index) => (
-          <motion.p
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.1 }}
-          >
-            {line.isUserInput ? (
-              <>
-                <span className="mr-2 text-gray-400">{`>`}</span>
-                <span>
-                  {line.type === "password" ? "*".repeat(line.text.length) : line.text}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="mr-2 text-gray-400">{`[${line.timestamp}]>`}</span>
-                <span>{line.text}</span>
-              </>
-            )}
-          </motion.p>
-        ))}
-        <div ref={terminalEndRef} />
-      </div>
-    </main>
-  );
+  return <AuthHistories history={history} />;
 }
