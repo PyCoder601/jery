@@ -51,3 +51,11 @@ class MetricData(BaseModel):
 class MetricRequestData(BaseModel):
     name: Optional[str] = None
     warning_level: Optional[float] = None
+
+
+class EmailCheckRequest(BaseModel):
+    email: str
+
+
+class UsernameCheckRequest(BaseModel):
+    username: str

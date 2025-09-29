@@ -58,24 +58,41 @@ export default function LoginPage() {
             { ...workflow.data, password: command.text as string } as UserLoginData,
             "login",
           );
-          console.log("res", res);
           if (res === 401) {
             dispatch(addHistory(addHistoryLine("Invalid username or password.")));
+            setWorkflow({
+              step: "login-email",
+              data: {},
+            });
+            dispatch(setCommandType("text"));
+            dispatch(addHistory(addHistoryLine("Enter your email or username:")));
             break;
           }
           if (res === 422) {
             dispatch(
               addHistory(addHistoryLine("Password is too short, min 8 characters.")),
             );
+            setWorkflow({
+              step: "login-email",
+              data: {},
+            });
+            dispatch(setCommandType("text"));
+            dispatch(addHistory(addHistoryLine("Enter your email or username:")));
             break;
           }
-          if (!res) {
+          if (res !== true) {
             dispatch(addHistory(addHistoryLine("An error occurred. Please try again.")));
+            setWorkflow({
+              step: "login-email",
+              data: {},
+            });
+            dispatch(setCommandType("text"));
+            dispatch(addHistory(addHistoryLine("Enter your email or username:")));
             break;
           }
           dispatch(setCommandType("text"));
           dispatch(addHistory(addHistoryLine("Login successful! Redirecting...")));
-          // setTimeout(() => (window.location.href = "/account"), 5000);
+          window.location.href = "/account";
           setWorkflow({ step: "done", data: {} });
           break;
         default:

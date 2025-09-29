@@ -12,14 +12,13 @@ import {
 import { AppDispatch } from "@/redux/store";
 import { UserSignupData } from "@/utils/types";
 import { addHistoryLine } from "@/utils/helpes";
-import { authenticate } from "@/services/auth";
+import { authenticate, checkEmail, checkUsername } from "@/services/auth";
 import AuthHistories from "@/components/AuthHistories";
 
 export default function SignupPage() {
   const dispatch: AppDispatch = useDispatch();
   const command = useSelector(selectCommand);
   const history = useSelector(selectHistory);
-  console.log(history);
 
   const [workflow, setWorkflow] = useState<{
     step: string;
@@ -42,64 +41,112 @@ export default function SignupPage() {
     const handleCommand = async () => {
       switch (workflow.step) {
         case "signup-email":
-          setWorkflow({
-            step: "signup-username",
-            data: { ...workflow.data, email: command.text as string },
-          });
-          dispatch(addHistory(addHistoryLine("Enter your desired username:")));
+          const emailExists = await checkEmail(command.text as string);
+          if (emailExists) {
+            dispatch(addHistory(addHistoryLine("This email is already taken.")));
+            dispatch(
+              addHistory(addHistoryLine("Please enter a different email address:")),
+            );
+          } else {
+            setWorkflow({
+              step: "signup-username",
+              data: { ...workflow.data, email: command.text as string },
+            });
+            dispatch(addHistory(addHistoryLine("Enter your desired username:")));
+          }
           break;
         case "signup-username":
-          setWorkflow({
-            step: "signup-password",
-            data: { ...workflow.data, username: command.text as string },
-          });
-          dispatch(setCommandType("password"));
-          dispatch(addHistory(addHistoryLine("Enter your password:")));
+          const usernameExists = await checkUsername(command.text as string);
+          if (usernameExists) {
+            dispatch(addHistory(addHistoryLine("This username is already taken.")));
+            dispatch(addHistory(addHistoryLine("Please enter a different username:")));
+          } else {
+            setWorkflow({
+              step: "signup-password",
+              data: { ...workflow.data, username: command.text as string },
+            });
+            dispatch(setCommandType("password"));
+            dispatch(
+              addHistory(addHistoryLine("Enter your password (min 8 characters):")),
+            );
+          }
           break;
         case "signup-password":
-          setWorkflow({
-            step: "signup-confirm-password",
-            data: { ...workflow.data, password: command.text as string },
-          });
-          dispatch(addHistory(addHistoryLine("Confirm your password:")));
+          if ((command.text as string).length < 8) {
+            dispatch(
+              addHistory(addHistoryLine("Password must be at least 8 characters long.")),
+            );
+            dispatch(addHistory(addHistoryLine("Please enter a new password:")));
+          } else {
+            setWorkflow({
+              step: "signup-confirm-password",
+              data: { ...workflow.data, password: command.text as string },
+            });
+            dispatch(addHistory(addHistoryLine("Confirm your password:")));
+          }
           break;
         case "signup-confirm-password":
-          if (command.text === workflow.data.password) {
-            const res: true | number | null = await authenticate(
-              workflow.data as UserSignupData,
-              "signup",
-            );
-            if (res === 400) {
-              dispatch(addHistory(addHistoryLine("Email or username already exists.")));
-              setTimeout(() => window.location.reload(), 2000);
-              break;
-            }
-            if (res === 422) {
-              dispatch(
-                addHistory(addHistoryLine("Password is too short, min 8 characters.")),
-              );
-              break;
-            }
-            if (!res) {
-              dispatch(
-                addHistory(addHistoryLine("An error occurred. Please try again.")),
-              );
-              setTimeout(() => window.location.reload(), 2000);
-              break;
-            }
+          if (command.text !== workflow.data.password) {
+            dispatch(addHistory(addHistoryLine("Passwords do not match.")));
+            setWorkflow((prev) => ({
+              ...prev,
+              step: "signup-password",
+              data: { ...prev.data, password: "" },
+            }));
+            dispatch(setCommandType("password"));
+            dispatch(addHistory(addHistoryLine("Enter your password:")));
+            break;
+          }
+
+          const res: true | number | null = await authenticate(
+            workflow.data as UserSignupData,
+            "signup",
+          );
+
+          if (res === true) {
+            dispatch(setCommandType("text"));
             dispatch(
               addHistory(addHistoryLine("Account created successfully! Redirecting...")),
             );
-            setTimeout(() => (window.location.href = "/account"), 2000);
-          } else {
-            dispatch(setCommandType("text"));
-            dispatch(
-              addHistory(addHistoryLine("Passwords do not match. Please start over.")),
-            );
-            setTimeout(() => window.location.reload(), 5000);
+            window.location.href = "/account";
+            setWorkflow({ step: "done", data: {} });
+            break;
           }
-          setWorkflow({ step: "done", data: {} });
-          break;
+
+          if (res === 400) {
+            dispatch(addHistory(addHistoryLine("Email or username already exists.")));
+            dispatch(addHistory(addHistoryLine("Please start over.")));
+            setWorkflow({
+              step: "signup-email",
+              data: {},
+            });
+            dispatch(setCommandType("text"));
+            dispatch(addHistory(addHistoryLine("Enter your email address:")));
+            break;
+          }
+
+          if (res === 422) {
+            dispatch(
+              addHistory(addHistoryLine("Password is too short, min 8 characters.")),
+            );
+            setWorkflow((prev) => ({
+              ...prev,
+              step: "signup-password",
+              data: { ...prev.data, password: "" },
+            }));
+            dispatch(setCommandType("password"));
+            dispatch(addHistory(addHistoryLine("Enter a new password:")));
+            break;
+          } else {
+            dispatch(addHistory(addHistoryLine("An error occurred. Please try again.")));
+            setWorkflow({
+              step: "signup-email",
+              data: {},
+            });
+            dispatch(setCommandType("text"));
+            dispatch(addHistory(addHistoryLine("Enter your email address:")));
+            break;
+          }
         default:
           break;
       }

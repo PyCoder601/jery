@@ -30,3 +30,27 @@ export async function authenticate(
     return null;
   }
 }
+
+export async function checkEmail(email: string) {
+  try {
+    const res: AxiosResponse<{ exists: boolean }> = await api.post(
+      "/signup/check-email",
+      { email },
+    );
+    return res.data.exists;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function checkUsername(username: string) {
+  try {
+    const res: AxiosResponse<{ exists: boolean }> = await api.post(
+      "/signup/check-username",
+      { username },
+    );
+    return res.data.exists;
+  } catch (error) {
+    return null;
+  }
+}

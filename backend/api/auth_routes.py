@@ -9,11 +9,33 @@ from .schemas import (
     UserSignupRequestData,
     UserLoginResponseData,
     UserLoginRequestData,
+    EmailCheckRequest,
+    UsernameCheckRequest,
 )
 from config.database import get_session
 from config.jwt import jwt_auth
 
 router = APIRouter()
+
+
+@router.post("/signup/check-email")
+async def check_email_exists(
+    data: EmailCheckRequest, async_session: AsyncSession = Depends(get_session)
+):
+    user = await async_session.exec(select(User).where(User.email == data.email))
+    if user.one_or_none():
+        return {"exists": True}
+    return {"exists": False}
+
+
+@router.post("/signup/check-username")
+async def check_username_exists(
+    data: UsernameCheckRequest, async_session: AsyncSession = Depends(get_session)
+):
+    user = await async_session.exec(select(User).where(User.username == data.username))
+    if user.one_or_none():
+        return {"exists": True}
+    return {"exists": False}
 
 
 @router.post("/signup", response_model=UserLoginResponseData)
