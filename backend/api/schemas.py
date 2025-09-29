@@ -33,7 +33,7 @@ class ServerData(BaseModel):
     created_at: str
     owner_id: int
     top_five_processes: Optional[str] = None
-    metrics: list["MetricData"] = []
+    metrics: Optional[list["MetricData"]] = []
 
 
 class ServerRequestData(BaseModel):

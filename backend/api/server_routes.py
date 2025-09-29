@@ -29,7 +29,7 @@ async def create_server(
     await async_session.commit()
     await async_session.refresh(new_server)
 
-    return new_server
+    return new_server.model_dump(mode="json")
 
 
 @router.get("/servers", response_model=List[ServerData])
@@ -45,7 +45,7 @@ async def get_servers(
         .options(selectinload(Server.metrics))  # type: ignore
     )
     servers = result.all()
-    return servers
+    return [server.model_dump(mode="json") for server in servers]
 
 
 @router.get("/server/{server_id}", response_model=ServerData)
@@ -72,7 +72,7 @@ async def get_server(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this server",
         )
-    return server
+    return server.model_dump(mode="json")
 
 
 @router.delete("/server/{server_id}", status_code=status.HTTP_204_NO_CONTENT)
