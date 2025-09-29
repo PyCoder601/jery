@@ -50,13 +50,7 @@ async def user_signup(
     response = JSONResponse(
         content={
             "access_token": access_token,
-            "user": {
-                "id": new_user.id,
-                "username": new_user.username,
-                "email": new_user.email,
-                "is_mail_verified": new_user.is_mail_verified,
-                "created_at": new_user.created_at.isoformat(),
-            },
+            "user": new_user.model_dump(mode="json", exclude={"hashed_password"}),
         },
         status_code=201,
     )
@@ -91,7 +85,10 @@ async def user_login(
     refresh_token = jwt_auth.create_refresh_token(user_id=is_user.id)
 
     response = JSONResponse(
-        content={"access_token": access_token, "user": is_user.model_dump()},
+        content={
+            "access_token": access_token,
+            "user": is_user.model_dump(mode="json", exclude={"hashed_password"}),
+        },
         status_code=200,
     )
 
