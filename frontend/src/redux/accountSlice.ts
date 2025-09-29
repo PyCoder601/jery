@@ -23,9 +23,14 @@ export const fetchServers = createAsyncThunk(
   "account/fetchServers",
   async (_, { rejectWithValue }) => {
     try {
-      return (await api.get("/servers")) as Server[];
+      const response = await api.get("/servers");
+      return response.data as Server[];
     } catch (error) {
-      return rejectWithValue(error);
+      const errorMessage =
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        error.response?.data?.detail || error.message || "Failed to fetch servers.";
+      return rejectWithValue(errorMessage);
     }
   },
 );
@@ -34,9 +39,14 @@ export const addServer = createAsyncThunk(
   "account/addServer",
   async (name: string, { rejectWithValue }) => {
     try {
-      return (await api.post("/server", { name })) as Server;
+      const response = await api.post("/server", { name });
+      return response.data as Server;
     } catch (error) {
-      return rejectWithValue(error);
+      const errorMessage =
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        error.response?.data?.detail || error.message || "Failed to add server.";
+      return rejectWithValue(errorMessage);
     }
   },
 );
@@ -68,6 +78,9 @@ const accountSlice = createSlice({
       })
       .addCase(addServer.fulfilled, (state, action) => {
         state.servers.push(action.payload);
+      })
+      .addCase(addServer.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
   },
 });
