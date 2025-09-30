@@ -120,9 +120,6 @@ async def agent_websocket_endpoint(
         logging.error(f"Erreur survenue pour le serveur {server.id}: {e}")
     finally:
         manager.disconnect_agent(server.id)
-        server.is_verified = False
-        session.add(server)
-        await session.commit()
         logging.info(f"Agent pour le serveur {server.id} déconnecté.")
 
 

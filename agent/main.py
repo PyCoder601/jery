@@ -92,7 +92,7 @@ async def send_metrics(websocket):
                     pass
             top_processes = sorted(
                 processes, key=lambda p: p["cpu_percent"], reverse=True
-            )[:5]
+            )[:10]
 
             data = {
                 "type": "metrics",

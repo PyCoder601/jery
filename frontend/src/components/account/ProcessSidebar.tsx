@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Terminal, XCircle } from "lucide-react";
+import { Cpu, MemoryStick, Terminal, XCircle } from "lucide-react";
 import { Server, TopProcess } from "@/utils/types";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
@@ -42,7 +42,18 @@ const ProcessSidebar: React.FC<ProcessSidebarProps> = ({ server }) => {
                 </span>
               </div>
               <div className="flex shrink-0 items-center">
-                <span className="mr-2 text-green-300">{p.cpu_percent.toFixed(1)}%</span>
+                <div className="mr-3 flex items-center" title="CPU Usage">
+                  <Cpu size={12} className="mr-1 text-gray-500" />
+                  <span className="text-green-300">
+                    {p.cpu_percent.toFixed(1)}%
+                  </span>
+                </div>
+                <div className="mr-2 flex items-center" title="Memory Usage">
+                  <MemoryStick size={12} className="mr-1 text-gray-500" />
+                  <span className="text-blue-300">
+                    {p.memory_percent.toFixed(1)}%
+                  </span>
+                </div>
                 <motion.button
                   whileHover={{ scale: 1.2, color: "#ef4444" }}
                   onClick={() => handleKillProcess(p.pid)}

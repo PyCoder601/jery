@@ -3,7 +3,7 @@ import React from "react";
 import { Server, Zap, Copy } from "lucide-react";
 import { motion } from "framer-motion";
 import { Server as ServerType } from "@/utils/types";
-import MetricView from "./MetricView";
+import MetricChart from "./MetricChart";
 
 interface ServerDetailProps {
   server: ServerType;
@@ -45,7 +45,7 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
           </h3>
           <div className="space-y-4">
             {server.metrics.map((metric) => (
-              <MetricView key={metric.id} metric={metric} />
+              <MetricChart key={metric.id} metric={metric} />
             ))}
           </div>
         </div>

@@ -85,15 +85,49 @@ const accountSlice = createSlice({
         top_five_processes: string;
       }>,
     ) => {
-      const { serverId, metrics, top_five_processes } = action.payload;
+      const { serverId, metrics: incomingMetrics, top_five_processes } = action.payload;
+
       const serverIndex = state.servers.findIndex((s) => s.id === serverId);
-      if (serverIndex !== -1) {
-        state.servers[serverIndex].metrics = metrics;
-        state.servers[serverIndex].top_five_processes = top_five_processes;
-      }
+      if (serverIndex === -1) return;
+
+      const oldServer = state.servers[serverIndex];
+
+      // Create new metrics array with updated history and levels
+      const newMetrics = oldServer.metrics.map((metric) => {
+        const incoming = incomingMetrics.find((im) => im.name === metric.name);
+        if (!incoming) return metric; // No update for this metric
+
+        const newHistory = [...(metric.history || [])];
+        newHistory.push({ time: Date.now(), level: incoming.current_level });
+        if (newHistory.length > 60) newHistory.shift();
+
+        return {
+          ...metric,
+          current_level: incoming.current_level,
+          history: newHistory,
+        };
+      });
+
+      // Add metrics that are in incoming but not in old state
+      incomingMetrics.forEach((incoming) => {
+        if (!newMetrics.some((m) => m.name === incoming.name)) {
+          newMetrics.push({
+            ...incoming,
+            history: [{ time: Date.now(), level: incoming.current_level }],
+          });
+        }
+      });
+
+      const newServer: Server = {
+        ...oldServer,
+        top_five_processes: top_five_processes,
+        metrics: newMetrics,
+      };
+
+      state.servers[serverIndex] = newServer;
+
       if (state.selectedServer?.id === serverId) {
-        state.selectedServer.metrics = metrics;
-        state.selectedServer.top_five_processes = top_five_processes;
+        state.selectedServer = newServer;
       }
     },
     updateServerStatus: (
@@ -120,9 +154,15 @@ const accountSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      .addCase(fetchServers.fulfilled, (state, action) => {
+      .addCase(fetchServers.fulfilled, (state, action: PayloadAction<Server[]>) => {
         state.loading = false;
-        state.servers = action.payload;
+        state.servers = action.payload.map((server) => ({
+          ...server,
+          metrics: server.metrics.map((metric) => ({
+            ...metric,
+            history: [],
+          })),
+        }));
       })
       .addCase(addServer.fulfilled, (state, action) => {
         state.servers.push(action.payload);

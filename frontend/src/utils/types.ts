@@ -39,12 +39,14 @@ export interface Metric {
   current_level: number;
   warning_level: number;
   created_at: string;
+  history: { time: number; level: number }[];
 }
 
 export interface TopProcess {
   pid: number;
   name: string;
   cpu_percent: number;
+  memory_percent: number;
 }
 
 export interface Server {

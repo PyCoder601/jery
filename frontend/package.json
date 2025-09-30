@@ -17,6 +17,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-redux": "^9.2.0",
+    "recharts": "^3.2.1",
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
