@@ -15,6 +15,7 @@ import {
   selectHistory,
 } from "@/redux/uiSlice";
 import { addHistoryLine } from "@/utils/helpes";
+import { initWebSocket, closeWebSocket } from "@/services/webSocketService";
 
 const AccountPage = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -27,9 +28,18 @@ const AccountPage = () => {
   const [commandStep, setCommandStep] = useState<string | null>(null);
 
   useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      initWebSocket(token);
+    }
+
     dispatch(clearHistory());
     dispatch(clearCommand());
     dispatch(fetchServers());
+
+    return () => {
+      closeWebSocket();
+    };
   }, [dispatch]);
 
   useEffect(() => {
@@ -93,7 +103,7 @@ const AccountPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="flex-grow"
+        className="w-1/2"
       >
         {loading && !selectedServer && <p>Loading server details...</p>}
         {error && <p className="text-red-500">{error}</p>}

@@ -1,6 +1,6 @@
 "use client";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Server, UserData } from "@/utils/types";
+import { Metric, Server, UserData } from "@/utils/types";
 import api from "@/services/api";
 
 interface AccountState {
@@ -51,6 +51,22 @@ export const addServer = createAsyncThunk(
   },
 );
 
+export const killProcess = createAsyncThunk(
+  "account/killProcess",
+  async ({ serverId, pid }: { serverId: number; pid: number }, { rejectWithValue }) => {
+    try {
+      await api.post(`/server/${serverId}/kill-process`, { pid });
+      return { serverId, pid }; // Return serverId and pid for potential UI updates
+    } catch (error) {
+      const errorMessage =
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        error.response?.data?.detail || error.message || "Failed to kill process.";
+      return rejectWithValue(errorMessage);
+    }
+  },
+);
+
 const accountSlice = createSlice({
   name: "account",
   initialState,
@@ -60,6 +76,38 @@ const accountSlice = createSlice({
     },
     setUser: (state, action: PayloadAction<UserData>) => {
       state.user = action.payload;
+    },
+    updateMetrics: (
+      state,
+      action: PayloadAction<{
+        serverId: number;
+        metrics: Metric[];
+        top_five_processes: string;
+      }>,
+    ) => {
+      const { serverId, metrics, top_five_processes } = action.payload;
+      const serverIndex = state.servers.findIndex((s) => s.id === serverId);
+      if (serverIndex !== -1) {
+        state.servers[serverIndex].metrics = metrics;
+        state.servers[serverIndex].top_five_processes = top_five_processes;
+      }
+      if (state.selectedServer?.id === serverId) {
+        state.selectedServer.metrics = metrics;
+        state.selectedServer.top_five_processes = top_five_processes;
+      }
+    },
+    updateServerStatus: (
+      state,
+      action: PayloadAction<{ serverId: number; is_verified: boolean }>,
+    ) => {
+      const { serverId, is_verified } = action.payload;
+      const serverIndex = state.servers.findIndex((s) => s.id === serverId);
+      if (serverIndex !== -1) {
+        state.servers[serverIndex].is_verified = is_verified;
+      }
+      if (state.selectedServer?.id === serverId) {
+        state.selectedServer.is_verified = is_verified;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -81,9 +129,22 @@ const accountSlice = createSlice({
       })
       .addCase(addServer.rejected, (state, action) => {
         state.error = action.payload as string;
+      })
+      .addCase(killProcess.pending, (state) => {
+        // Optionally handle loading state for killing a process
+      })
+      .addCase(killProcess.fulfilled, (state, action) => {
+        // Optionally handle success, e.g., show a notification
+        console.log(
+          `Process ${action.payload.pid} on server ${action.payload.serverId} terminated.`,
+        );
+      })
+      .addCase(killProcess.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
   },
 });
 
-export const { selectServer, setUser } = accountSlice.actions;
+export const { selectServer, setUser, updateMetrics, updateServerStatus } =
+  accountSlice.actions;
 export default accountSlice.reducer;

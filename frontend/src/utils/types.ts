@@ -54,6 +54,6 @@ export interface Server {
   is_verified: boolean;
   created_at: string;
   owner_id: number;
-  top_five_processes: TopProcess;
+  top_five_processes: string;
   metrics: Metric[];
 }
