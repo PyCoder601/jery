@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
-    container_name: postgres_db
+    container_name: jery_db_2
     restart: always
     env_file:
       - ./.env
@@ -15,22 +13,27 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
       context: .
-      dockerfile: backend/Dockerfile
-    container_name: backend_app
+      dockerfile: ./Dockerfile
+    container_name: jery_backend_2
     restart: always
     ports:
-      - "8003:8003"
+      - "8004:8004"
     env_file:
       - ./.env
     volumes:
       - ./backend:/app/backend
-    command: uvicorn backend.main:app --host 0.0.0.0 --port 8003
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:
