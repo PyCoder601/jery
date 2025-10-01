@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { Github } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,10 +15,8 @@ import { AppDispatch } from "@/redux/store";
 import { addHistoryLine } from "@/utils/helpes";
 
 const JeryAscii = () => (
-  <pre className="mb-4 select-none text-sm font-bold">
-    <span
-      className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
-    >
+  <pre className="mb-4 text-lg font-bold select-none">
+    <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
       {`
       ██╗███████╗██████╗ ██╗   ██╗
       ██║██╔════╝██╔══██╗╚██╗ ██╔╝
@@ -38,10 +37,25 @@ const WelcomeText = () => (
         Type <code className="text-red-400">signup</code> to create a new account.
       </li>
       <li>
-        Type <code className="text-red-400">login</code> if you already have an
-        account.
+        Type <code className="text-red-400">login</code> if you already have an account.
       </li>
     </ul>
+  </div>
+);
+
+const Footer = () => (
+  <div className="p-4 text-left text-xs text-gray-500">
+    <p className="mb-2">
+      <a
+        href="https://github.com/your-repo"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center hover:text-gray-400"
+      >
+        <Github className="mr-2 h-4 w-4" />
+        GitHub Repository
+      </a>
+    </p>
   </div>
 );
 
@@ -123,6 +137,7 @@ export default function Home() {
       <div className="flex-grow overflow-y-auto pr-2">
         <JeryAscii />
         <WelcomeText />
+        <Footer />
         {history.map((line, index) => (
           <motion.p
             key={index}

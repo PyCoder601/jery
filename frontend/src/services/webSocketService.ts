@@ -4,7 +4,7 @@ import { updateMetrics, updateServerStatus } from "@/redux/accountSlice";
 let socket: WebSocket | null = null;
 
 const getWebSocketURL = (token: string): string => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002/api";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
   const wsUrl = apiUrl.replace(/^http/, "ws");
   return `${wsUrl}/ws/frontend/${token}`;
 };

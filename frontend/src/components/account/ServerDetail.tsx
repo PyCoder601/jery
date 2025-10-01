@@ -19,24 +19,16 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
   -e BACKEND_URL="ws://host.docker.internal:8000/api/ws/metrics/" \
   --name jery-agent-${server.id} \
   jery/agent:latest`;
-
-  const diskTotalMetric = server.metrics.find(
+  server.metrics.find(
     (m) =>
       m.name.toLowerCase().includes("disk") && m.name.toLowerCase().includes("total"),
   );
-  const memTotalMetric = server.metrics.find(
+  server.metrics.find(
     (m) =>
       (m.name.toLowerCase().includes("memory") || m.name.toLowerCase().includes("ram")) &&
       m.name.toLowerCase().includes("total"),
   );
-
-  const diskTotal = diskTotalMetric ? diskTotalMetric.current_level : undefined;
-  const memTotal = memTotalMetric ? memTotalMetric.current_level : undefined;
-
-  const metricsToDisplay = server.metrics.filter(
-    (m) => !m.name.toLowerCase().includes("total"),
-  );
-
+  server.metrics.filter((m) => !m.name.toLowerCase().includes("total"));
   return (
     <motion.div
       key={server.id}
@@ -88,7 +80,7 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
           <div>
             <p className="mb-3 text-sm text-yellow-100">
               Si Docker est installé sur votre serveur, vous pouvez utiliser cette
-              commande unique pour démarrer l'agent.
+              commande unique pour démarrer l&#39;agent.
             </p>
             <div className="group relative">
               <pre className="overflow-x-auto rounded-md bg-gray-900 p-3 text-sm text-white">
@@ -103,8 +95,9 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
               </button>
             </div>
             <p className="mt-2 text-xs text-gray-400">
-              Note: L'image <code className="font-mono text-xs">jery/agent:latest</code>{" "}
-              est un exemple. Remplacez-la par l'image fournie par votre administrateur.
+              Note: L&#39;image{" "}
+              <code className="font-mono text-xs">jery/agent:latest</code> est un exemple.
+              Remplacez-la par l&#39;image fournie par votre administrateur.
             </p>
           </div>
         </div>

@@ -46,7 +46,7 @@ const RobotGuide = () => {
         setMessage(
           "This page allows you to manage your servers. Use the `add-server` command to add a new server and start monitoring your applications.",
         );
-        setSuggestions(["add-server"]);
+        setSuggestions(["add-server", "logout"]);
         break;
       default:
         setMessage(
