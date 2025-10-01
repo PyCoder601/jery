@@ -43,6 +43,7 @@ class ServerRequestData(BaseModel):
 class MetricData(BaseModel):
     id: int
     name: str
+    total: int
     current_level: float
     warning_level: float
     created_at: str

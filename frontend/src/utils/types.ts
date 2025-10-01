@@ -39,6 +39,7 @@ export interface Metric {
   current_level: number;
   warning_level: number;
   created_at: string;
+  total: number;
   history: { time: number; level: number }[];
 }
 

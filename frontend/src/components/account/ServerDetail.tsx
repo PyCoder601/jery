@@ -11,9 +11,7 @@ interface ServerDetailProps {
 
 const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
   const handleCopyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      // Optionally, add some user feedback here, like a toast notification.
-    });
+    navigator.clipboard.writeText(text).then(() => {});
   };
 
   const dockerCommand = `docker run -d --restart=always \
@@ -21,6 +19,23 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
   -e BACKEND_URL="ws://host.docker.internal:8000/api/ws/metrics/" \
   --name jery-agent-${server.id} \
   jery/agent:latest`;
+
+  const diskTotalMetric = server.metrics.find(
+    (m) =>
+      m.name.toLowerCase().includes("disk") && m.name.toLowerCase().includes("total"),
+  );
+  const memTotalMetric = server.metrics.find(
+    (m) =>
+      (m.name.toLowerCase().includes("memory") || m.name.toLowerCase().includes("ram")) &&
+      m.name.toLowerCase().includes("total"),
+  );
+
+  const diskTotal = diskTotalMetric ? diskTotalMetric.current_level : undefined;
+  const memTotal = memTotalMetric ? memTotalMetric.current_level : undefined;
+
+  const metricsToDisplay = server.metrics.filter(
+    (m) => !m.name.toLowerCase().includes("total"),
+  );
 
   return (
     <motion.div
@@ -44,9 +59,25 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
             Metrics
           </h3>
           <div className="space-y-4">
-            {server.metrics.map((metric) => (
-              <MetricChart key={metric.id} metric={metric} />
-            ))}
+            {server.metrics.map((metric) => {
+              let unit: string | undefined;
+              if (metric.name.toLowerCase().includes("disk")) {
+                unit = "GB";
+              } else if (
+                metric.name.toLowerCase().includes("memory") ||
+                metric.name.toLowerCase().includes("ram")
+              ) {
+                unit = "MB";
+              }
+              return (
+                <MetricChart
+                  key={metric.id}
+                  metric={metric}
+                  totalSize={metric.total}
+                  unit={unit}
+                />
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -56,8 +87,8 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
           </h3>
           <div>
             <p className="mb-3 text-sm text-yellow-100">
-              Si Docker est installé sur votre serveur, vous pouvez utiliser
-              cette commande unique pour démarrer l'agent.
+              Si Docker est installé sur votre serveur, vous pouvez utiliser cette
+              commande unique pour démarrer l'agent.
             </p>
             <div className="group relative">
               <pre className="overflow-x-auto rounded-md bg-gray-900 p-3 text-sm text-white">
@@ -65,17 +96,15 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
               </pre>
               <button
                 onClick={() => handleCopyToClipboard(dockerCommand)}
-                className="absolute right-2 top-2 rounded-md bg-gray-700 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+                className="absolute top-2 right-2 rounded-md bg-gray-700 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
                 title="Copy to clipboard"
               >
                 <Copy size={16} />
               </button>
             </div>
             <p className="mt-2 text-xs text-gray-400">
-              Note: L'image{" "}
-              <code className="font-mono text-xs">jery/agent:latest</code> est un
-              exemple. Remplacez-la par l'image fournie par votre
-              administrateur.
+              Note: L'image <code className="font-mono text-xs">jery/agent:latest</code>{" "}
+              est un exemple. Remplacez-la par l'image fournie par votre administrateur.
             </p>
           </div>
         </div>

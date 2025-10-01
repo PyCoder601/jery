@@ -82,12 +82,14 @@ async def agent_websocket_endpoint(
                     metric = q.one_or_none()
                     if metric:
                         metric.current_level = metric_update["level"]
+                        metric.total = metric_update.get("total", 0)
                         session.add(metric)
                         updated_metrics_obj.append(metric)
                     else:
                         new_metric = Metric(
                             name=metric_update["name"],
                             current_level=metric_update["level"],
+                            total=metric_update.get("total", 0),
                             warning_level=80.0,  # Default warning level
                             server_id=server.id,
                         )
@@ -150,6 +152,7 @@ async def kill_process(
         )
 
     command = {"action": "kill", "pid": pid}
-    await manager.send_to_agent(json.dumps(command), server.id)
+    res = await manager.send_to_agent(json.dumps(command), server.id)
+    print(res)
 
     return {"message": f"Commande pour tuer le processus {pid} envoyée."}

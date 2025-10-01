@@ -21,18 +21,8 @@ async def handle_kill_process(pid):
     """Tente de tuer un processus par son PID."""
     try:
         p = psutil.Process(pid)
-        p.terminate()  # Envoie SIGTERM (plus propre)
-        logging.info(f"Tentative de terminaison du processus {pid}...")
-        try:
-            p.wait(timeout=3)
-            logging.info(f"Processus {pid} terminé avec succès.")
-            return {"status": "success", "pid": pid, "message": "Process terminated."}
-        except psutil.TimeoutExpired:
-            p.kill()  # Envoie SIGKILL (force)
-            logging.warning(
-                f"Le processus {pid} n'a pas répondu à SIGTERM, envoi de SIGKILL."
-            )
-            return {"status": "success", "pid": pid, "message": "Process killed."}
+        p.kill()
+        return {"status": "success", "pid": pid, "message": "Process killed."}
     except psutil.NoSuchProcess:
         logging.error(f"Processus {pid} non trouvé.")
         return {"status": "error", "pid": pid, "message": "Process not found."}
@@ -52,11 +42,9 @@ async def listen_for_commands(websocket):
         async for message in websocket:
             try:
                 command = json.loads(message)
-                logging.info(f"Commande reçue: {command}")
                 if command.get("action") == "kill" and "pid" in command:
                     pid = command["pid"]
                     result = await handle_kill_process(pid)
-                    # Renvoyer un accusé de réception au backend
                     await websocket.send(
                         json.dumps({"type": "kill_result", "data": result})
                     )
@@ -70,6 +58,7 @@ async def listen_for_commands(websocket):
 
 async def send_metrics(websocket):
     """Envoie les métriques système à intervalles réguliers."""
+    cpu_count = psutil.cpu_count() or 1
     while True:
         try:
             # Collecte des métriques
@@ -83,7 +72,9 @@ async def send_metrics(websocket):
                 ["pid", "name", "cpu_percent", "memory_percent"]
             ):
                 try:
-                    processes.append(proc.info)
+                    info = proc.info
+                    info["cpu_percent"] = info["cpu_percent"] / cpu_count
+                    processes.append(info)
                 except (
                     psutil.NoSuchProcess,
                     psutil.AccessDenied,
@@ -98,9 +89,17 @@ async def send_metrics(websocket):
                 "type": "metrics",
                 "data": {
                     "metrics": [
-                        {"name": "CPU", "level": cpu_percent},
-                        {"name": "RAM", "level": mem.percent},
-                        {"name": "Disk", "level": disk.percent},
+                        {"name": "CPU", "level": cpu_percent, "total": 100},
+                        {
+                            "name": "RAM",
+                            "level": mem.percent,
+                            "total": mem.total // (1024**2),
+                        },
+                        {
+                            "name": "Disk",
+                            "level": disk.percent,
+                            "total": disk.total // (1024**3),
+                        },
                     ],
                     "top_processes": top_processes,
                 },
