@@ -5,12 +5,10 @@ interface UsageBarProps {
 }
 
 const UsageBar: React.FC<UsageBarProps> = ({ percentage }) => {
-  const color = percentage > 90 ? 'bg-red-500' : percentage > 70 ? 'bg-yellow-500' : 'bg-green-400';
-
   return (
-    <div className="w-full bg-gray-700 rounded-full h-2.5 dark:bg-gray-700">
+    <div className="h-2.5 w-full rounded-full bg-gray-700 dark:bg-gray-700">
       <div
-        className={`${color} h-2.5 rounded-full`}
+        className="h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
         style={{ width: `${percentage}%` }}
       ></div>
     </div>

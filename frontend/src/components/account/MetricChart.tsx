@@ -60,20 +60,26 @@ const MetricChart: React.FC<MetricChartProps> = ({
       <div style={{ width: '100%', height: 150 }}>
         <ResponsiveContainer>
           <LineChart data={data}>
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.8} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#4A5568" />
             <XAxis dataKey="time" stroke="#A0AEC0" fontSize={10} />
             <YAxis stroke="#A0AEC0" fontSize={10} domain={[0, 100]} />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1A202C',
-                border: '1px solid #2D3748',
+                backgroundColor: "#1A202C",
+                border: "1px solid #2D3748",
               }}
-              labelStyle={{ color: '#E2E8F0' }}
+              labelStyle={{ color: "#E2E8F0" }}
             />
             <Line
               type="monotone"
               dataKey="level"
-              stroke="#48BB78"
+              stroke="url(#colorUv)"
               strokeWidth={2}
               dot={false}
               isAnimationActive={false}
