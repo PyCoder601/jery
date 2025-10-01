@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "./backend/"
-          target: "/root/romeo"
+          target: "/root/romeo/jery"
 
       - name: SSH and deploy
         uses: appleboy/ssh-action@master
