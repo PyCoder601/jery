@@ -92,10 +92,9 @@ const accountSlice = createSlice({
 
       const oldServer = state.servers[serverIndex];
 
-      // Create new metrics array with updated history and levels
       const newMetrics = oldServer.metrics.map((metric) => {
         const incoming = incomingMetrics.find((im) => im.name === metric.name);
-        if (!incoming) return metric; // No update for this metric
+        if (!incoming) return metric;
 
         const newHistory = [...(metric.history || [])];
         newHistory.push({ time: Date.now(), level: incoming.current_level });
@@ -108,7 +107,6 @@ const accountSlice = createSlice({
         };
       });
 
-      // Add metrics that are in incoming but not in old state
       incomingMetrics.forEach((incoming) => {
         if (!newMetrics.some((m) => m.name === incoming.name)) {
           newMetrics.push({
@@ -169,15 +167,6 @@ const accountSlice = createSlice({
       })
       .addCase(addServer.rejected, (state, action) => {
         state.error = action.payload as string;
-      })
-      .addCase(killProcess.pending, (state) => {
-        // Optionally handle loading state for killing a process
-      })
-      .addCase(killProcess.fulfilled, (state, action) => {
-        // Optionally handle success, e.g., show a notification
-        console.log(
-          `Process ${action.payload.pid} on server ${action.payload.serverId} terminated.`,
-        );
       })
       .addCase(killProcess.rejected, (state, action) => {
         state.error = action.payload as string;

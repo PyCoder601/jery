@@ -38,7 +38,7 @@ export async function checkEmail(email: string) {
       { email },
     );
     return res.data.exists;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -50,7 +50,7 @@ export async function checkUsername(username: string) {
       { username },
     );
     return res.data.exists;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
