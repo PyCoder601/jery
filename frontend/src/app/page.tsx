@@ -13,6 +13,38 @@ import {
 import { AppDispatch } from "@/redux/store";
 import { addHistoryLine } from "@/utils/helpes";
 
+const JeryAscii = () => (
+  <pre className="mb-4 select-none text-sm font-bold">
+    <span
+      className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
+    >
+      {`
+      ██╗███████╗██████╗ ██╗   ██╗
+      ██║██╔════╝██╔══██╗╚██╗ ██╔╝
+      ██║█████╗  ██████╔╝ ╚████╔╝ 
+██╗   ██║██╔══╝  ██╔══██╗  ╚██╔╝  
+╚██████╔╝███████╗██║  ██║   ██║   
+ ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   
+`}
+    </span>
+  </pre>
+);
+
+const WelcomeText = () => (
+  <div className="mb-4 text-gray-300">
+    <p className="mb-2 font-bold">Tips for getting started:</p>
+    <ul className="list-inside list-disc">
+      <li>
+        Type <code className="text-red-400">signup</code> to create a new account.
+      </li>
+      <li>
+        Type <code className="text-red-400">login</code> if you already have an
+        account.
+      </li>
+    </ul>
+  </div>
+);
+
 const lines = [
   { text: "Booting Jery Monitoring System...", delay: 100 },
   { text: "Version: 1.0.0-beta", delay: 150 },
@@ -58,9 +90,6 @@ export default function Home() {
       case "login":
         router.push("/login");
         break;
-      case "about":
-        router.push("/about");
-        break;
       default:
         dispatch(
           addHistory(
@@ -73,7 +102,7 @@ export default function Home() {
   }, [command.text, dispatch, router]);
 
   const colorizeText = (text: string) => {
-    const wordsToColor = ["'signup'", "'login'", "'about'"];
+    const wordsToColor = ["'signup'", "'login'"];
     const regex = new RegExp(`(${wordsToColor.join("|")})`, "g");
     const parts = text.split(regex);
 
@@ -92,6 +121,8 @@ export default function Home() {
   return (
     <div className="flex h-full flex-col font-mono text-sm text-green-400">
       <div className="flex-grow overflow-y-auto pr-2">
+        <JeryAscii />
+        <WelcomeText />
         {history.map((line, index) => (
           <motion.p
             key={index}
