@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bot, Lightbulb } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const TypingText = ({ text, onComplete }: { text: string; onComplete: () => void }) => {
   const [displayedText, setDisplayedText] = useState("");
@@ -30,13 +31,38 @@ const TypingText = ({ text, onComplete }: { text: string; onComplete: () => void
 const RobotGuide = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [message, setMessage] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const pathname = usePathname();
 
-  const suggestions = ["signup", "login", "about"];
-  const message = "Not sure where to start? Try one of these commands in the terminal:";
+  useEffect(() => {
+    switch (pathname) {
+      case "/login":
+      case "/signup":
+        setMessage("Passwords must be at least 8 characters long.");
+        setSuggestions([]);
+        break;
+      case "/account":
+        setMessage(
+          "This page allows you to manage your servers. Use the `add-server` command to add a new server and start monitoring your applications.",
+        );
+        setSuggestions(["add-server"]);
+        break;
+      default:
+        setMessage(
+          "Not sure where to start? Try one of these commands in the terminal:",
+        );
+        setSuggestions(["signup", "login"]);
+        break;
+    }
+    setShowSuggestions(false);
+  }, [pathname]);
 
   const handleTypingComplete = useCallback(() => {
-    setShowSuggestions(true);
-  }, []);
+    if (suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  }, [suggestions]);
 
   return (
     <div className="fixed right-8 bottom-8 z-50 flex items-end space-x-4">

@@ -26,11 +26,16 @@ const AccountPage = () => {
   const history = useSelector(selectHistory);
 
   const [commandStep, setCommandStep] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     if (token) {
+      setIsAuthenticated(true);
       initWebSocket(token);
+    } else {
+      setIsAuthenticated(false);
+      window.location.href = "/";
     }
 
     dispatch(clearHistory());
@@ -43,7 +48,7 @@ const AccountPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!command?.text) return;
+    if (!command?.text || !isAuthenticated) return;
 
     const commandStr = command.text.toLowerCase().trim();
 
@@ -70,17 +75,26 @@ const AccountPage = () => {
         setCommandStep("awaiting_server_name");
         dispatch(addHistory(addHistoryLine("Enter server name:")));
         break;
+      case "logout":
+        sessionStorage.removeItem("token");
+        dispatch(addHistory(addHistoryLine("Logging out...")));
+        window.location.href = "/";
+        break;
       default:
         dispatch(addHistory(addHistoryLine(`Unknown command: ${commandStr}`)));
         break;
     }
 
     dispatch(clearCommand());
-  }, [command, dispatch, commandStep]);
+  }, [command, dispatch, commandStep, isAuthenticated]);
 
   const handleSelectServer = (serverId: number) => {
     dispatch(selectServer(serverId));
   };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4 lg:flex-row">

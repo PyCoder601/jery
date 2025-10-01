@@ -16,7 +16,7 @@ logging.basicConfig(
 
 BACKEND_URL = os.getenv("BACKEND_URL", "ws://localhost:8002/api/ws/metrics/")
 API_KEY = os.getenv("API_KEY")
-INTERVAL = int(os.getenv("INTERVAL", 2))
+INTERVAL = 2
 
 logging.info(f"Agent started with API_KEY: {API_KEY}")
 logging.info(f"Backend URL: {BACKEND_URL}")
@@ -46,8 +46,15 @@ async def listen_for_commands(websocket):
     try:
         async for message in websocket:
             try:
-                command = json.loads(message)
-                if command.get("action") == "kill" and "pid" in command:
+                command = message
+                while isinstance(command, str):
+                    command = json.loads(command)
+
+                if (
+                    isinstance(command, dict)
+                    and command.get("action") == "kill"
+                    and "pid" in command
+                ):
                     pid = command["pid"]
                     result = await handle_kill_process(pid)
                     await websocket.send(

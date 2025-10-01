@@ -152,7 +152,7 @@ async def kill_process(
         )
 
     command = {"action": "kill", "pid": pid}
-    res = await manager.send_to_agent(json.dumps(command), server.id)
+    res = await manager.send_to_agent(command, server.id)
     print(res)
 
     return {"message": f"Commande pour tuer le processus {pid} envoyée."}
