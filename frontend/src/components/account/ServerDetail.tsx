@@ -42,7 +42,7 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
       key={server.id}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="h-full rounded-lg border border-gray-700 bg-gray-800/50 p-6"
+      className="h-full overflow-y-auto rounded-lg border border-gray-700 bg-gray-800/50 p-6"
     >
       <div className="mb-6 flex items-center">
         <Server className="mr-4 h-8 w-8 text-green-400" />

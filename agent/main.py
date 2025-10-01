@@ -4,9 +4,11 @@ import os
 import psutil
 import websockets
 import logging
+
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -15,6 +17,9 @@ logging.basicConfig(
 BACKEND_URL = os.getenv("BACKEND_URL", "ws://localhost:8002/api/ws/metrics/")
 API_KEY = os.getenv("API_KEY")
 INTERVAL = int(os.getenv("INTERVAL", 2))
+
+logging.info(f"Agent started with API_KEY: {API_KEY}")
+logging.info(f"Backend URL: {BACKEND_URL}")
 
 
 async def handle_kill_process(pid):

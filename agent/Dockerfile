@@ -16,7 +16,7 @@ COPY main.py .
 # Variables d'environnement qui devront être fournies au lancement
 # docker run -e API_KEY="votre_clé" -e BACKEND_URL="ws://votre_backend_url" ...
 ENV API_KEY=""
-ENV BACKEND_URL="ws://host.docker.internal:8000/api/ws/metrics/"
-ENV INTERVAL="5"
+ENV BACKEND_URL="ws://localhost:8002/api/ws/metrics/"
+ENV INTERVAL="2"
 
 CMD ["python", "main.py"]

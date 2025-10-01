@@ -83,12 +83,12 @@ const AccountPage = () => {
   };
 
   return (
-    <div className="flex h-full w-full gap-4 p-4">
+    <div className="flex h-full w-full flex-col gap-4 p-4 lg:flex-row">
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-1/4"
+        className="w-full lg:w-1/4"
       >
         <ServerList
           servers={servers}
@@ -103,7 +103,7 @@ const AccountPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="w-1/2"
+        className="w-full lg:w-1/2"
       >
         {loading && !selectedServer && <p>Loading server details...</p>}
         {error && <p className="text-red-500">{error}</p>}
@@ -122,7 +122,7 @@ const AccountPage = () => {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="w-1/4"
+        className="w-full lg:w-1/4"
       >
         {selectedServer && <ProcessSidebar server={selectedServer} />}
       </motion.div>
