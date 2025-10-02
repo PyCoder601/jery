@@ -16,9 +16,8 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
 
   const dockerCommand = `docker run -d --restart=always \
   -e API_KEY="${server.api_key}" \
-  -e BACKEND_URL="ws://host.docker.internal:8000/api/ws/metrics/" \
   --name jery-agent-${server.id} \
-  jery/agent:latest`;
+  romeomanoela/jery-agent:latest`;
   server.metrics.find(
     (m) =>
       m.name.toLowerCase().includes("disk") && m.name.toLowerCase().includes("total"),
