@@ -9,7 +9,7 @@ export async function authenticate(
   data: UserLoginData | UserSignupData,
   auth_type: "login" | "signup",
 ) {
-  console.log("Authenticating...", data);
+
   try {
     const res: AxiosResponse = await api.post(`/${auth_type}`, data, {
       withCredentials: true,

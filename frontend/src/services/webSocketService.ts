@@ -17,13 +17,11 @@ export const initWebSocket = (token: string) => {
   const url = getWebSocketURL(token);
   socket = new WebSocket(url);
 
-  socket.onopen = () => {
-    console.log("WebSocket connection established");
-  };
+  socket.onopen = () => {};
 
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    console.log(message);
+
     switch (message.type) {
       case "METRICS_UPDATE":
         store.dispatch(updateMetrics(message));
@@ -42,7 +40,6 @@ export const initWebSocket = (token: string) => {
   };
 
   socket.onclose = () => {
-    console.log("WebSocket connection closed");
     socket = null;
   };
 

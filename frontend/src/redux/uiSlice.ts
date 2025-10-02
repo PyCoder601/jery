@@ -16,7 +16,7 @@ const uiSlice = createSlice({
       state.inputValue = action.payload;
     },
     setCommand: (state, action: PayloadAction<string>) => {
-      console.log("Clearing command", state.command);
+
       state.command.text = action.payload;
     },
     clearCommand: (state) => {
