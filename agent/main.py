@@ -9,7 +9,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-BACKEND_URL = "jery-api.romeo-tech.com/api/wss/metrics/"
+BACKEND_URL = "wss://jery-api.romeo-tech.com/api/ws/metrics/"
 API_KEY = os.getenv("API_KEY")
 INTERVAL = 2
 
