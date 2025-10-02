@@ -38,9 +38,16 @@ const RobotGuide = () => {
   useEffect(() => {
     switch (pathname) {
       case "/login":
+        setMessage(
+          "If you don't have an account, you can use the `/signup` command to create one.",
+        );
+        setSuggestions(["/signup"]);
+        break;
       case "/signup":
-        setMessage("Passwords must be at least 8 characters long.");
-        setSuggestions([]);
+        setMessage(
+          "If you already have an account, you can use the `/login` command to sign in.",
+        );
+        setSuggestions(["/login"]);
         break;
       case "/account":
         setMessage(

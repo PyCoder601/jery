@@ -38,6 +38,13 @@ export default function SignupPage() {
   useEffect(() => {
     if (!command?.text) return;
 
+    if (command.text === "/login") {
+      dispatch(addHistory(addHistoryLine("Redirecting to login...")));
+      dispatch(clearCommand());
+      window.location.href = "/login";
+      return;
+    }
+
     const handleCommand = async () => {
       switch (workflow.step) {
         case "signup-email":
