@@ -78,8 +78,8 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
           </h3>
           <div>
             <p className="mb-3 text-sm text-yellow-100">
-              Si Docker est installé sur votre serveur, vous pouvez utiliser cette
-              commande unique pour démarrer l&#39;agent.
+              If you have Docker installed on your server, you can use this single command
+              to start the agent.
             </p>
             <div className="group relative">
               <pre className="overflow-x-auto rounded-md bg-gray-900 p-3 text-sm text-white">
@@ -93,11 +93,6 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
                 <Copy size={16} />
               </button>
             </div>
-            <p className="mt-2 text-xs text-gray-400">
-              Note: L&#39;image{" "}
-              <code className="font-mono text-xs">jery/agent:latest</code> est un exemple.
-              Remplacez-la par l&#39;image fournie par votre administrateur.
-            </p>
           </div>
         </div>
       )}
