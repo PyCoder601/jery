@@ -15,16 +15,6 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
   };
 
   const dockerCommand = `docker run -d --restart=always --network="host" --pid="host" -e API_KEY="${server.api_key}" --name jery-agent romeomanoela/jery-agent:latest`;
-  server.metrics.find(
-    (m) =>
-      m.name.toLowerCase().includes("disk") && m.name.toLowerCase().includes("total"),
-  );
-  server.metrics.find(
-    (m) =>
-      (m.name.toLowerCase().includes("memory") || m.name.toLowerCase().includes("ram")) &&
-      m.name.toLowerCase().includes("total"),
-  );
-  server.metrics.filter((m) => !m.name.toLowerCase().includes("total"));
   return (
     <motion.div
       key={server.id}
@@ -65,6 +55,7 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
                   unit={unit}
                 />
               );
+            })}
           </div>
 
           <div className="mt-6 rounded-lg border border-dashed border-gray-700 bg-gray-800/50 p-4 text-sm">

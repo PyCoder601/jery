@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { addServer, fetchServers, selectServer } from "@/redux/accountSlice";
+import { addServer, deleteServer, fetchServers, selectServer } from "@/redux/accountSlice";
 import ServerList from "@/components/account/ServerList";
 import ServerDetail from "@/components/account/ServerDetail";
 import ProcessSidebar from "@/components/account/ProcessSidebar";
@@ -52,6 +52,24 @@ const AccountPage = () => {
 
     const commandStr = command.text.toLowerCase().trim();
 
+    if (commandStep === "awaiting_server_name") {
+      dispatch(addServer(command.text)).then((action) => {
+        if (addServer.fulfilled.match(action)) {
+          const newServer = action.payload;
+          dispatch(
+            addHistory(
+              addHistoryLine(
+                `Server '${newServer.name}' created. API Key: ${newServer.api_key}`,
+              ),
+            ),
+          );
+        }
+      });
+      setCommandStep(null);
+      dispatch(clearCommand());
+      return;
+    }
+
     if (commandStep === "awaiting_server_name_to_delete") {
       const serverName = command.text.trim();
       const serverToDelete = servers.find((s) => s.name === serverName);
@@ -86,7 +104,7 @@ const AccountPage = () => {
     }
 
     dispatch(clearCommand());
-  }, [command, dispatch, commandStep, isAuthenticated]);
+  }, [command, dispatch, commandStep, isAuthenticated, servers]);
 
   const handleSelectServer = (serverId: number) => {
     dispatch(selectServer(serverId));
