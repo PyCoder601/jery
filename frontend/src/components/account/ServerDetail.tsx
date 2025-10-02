@@ -14,7 +14,7 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
     navigator.clipboard.writeText(text).then(() => {});
   };
 
-  const dockerCommand = `docker run -d --restart=always --network="host" --pid="host" -e API_KEY="${server.api_key}" --name jery-agent romeomanoela/jery-agent:latest`;
+  const dockerCommand = `docker run -d --restart=always --network="host" --pid="host" --privileged -e API_KEY="${server.api_key}" --name jery-agent romeomanoela/jery-agent:latest`;
   return (
     <motion.div
       key={server.id}
