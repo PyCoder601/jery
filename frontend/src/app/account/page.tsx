@@ -52,19 +52,15 @@ const AccountPage = () => {
 
     const commandStr = command.text.toLowerCase().trim();
 
-    if (commandStep === "awaiting_server_name") {
-      dispatch(addServer(command.text)).then((action) => {
-        if (addServer.fulfilled.match(action)) {
-          const newServer = action.payload;
-          dispatch(
-            addHistory(
-              addHistoryLine(
-                `Server '${newServer.name}' created. API Key: ${newServer.api_key}`,
-              ),
-            ),
-          );
-        }
-      });
+    if (commandStep === "awaiting_server_name_to_delete") {
+      const serverName = command.text.trim();
+      const serverToDelete = servers.find((s) => s.name === serverName);
+      if (serverToDelete) {
+        dispatch(deleteServer(serverToDelete.id));
+        dispatch(addHistory(addHistoryLine(`Deleting server '${serverName}'...`)));
+      } else {
+        dispatch(addHistory(addHistoryLine(`Server '${serverName}' not found.`)));
+      }
       setCommandStep(null);
       dispatch(clearCommand());
       return;
@@ -74,6 +70,10 @@ const AccountPage = () => {
       case "add-server":
         setCommandStep("awaiting_server_name");
         dispatch(addHistory(addHistoryLine("Enter server name:")));
+        break;
+      case "delete-server":
+        setCommandStep("awaiting_server_name_to_delete");
+        dispatch(addHistory(addHistoryLine("Enter server name to delete:")));
         break;
       case "logout":
         sessionStorage.removeItem("token");
@@ -122,31 +122,7 @@ const AccountPage = () => {
         {loading && !selectedServer && <p>Loading server details...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {selectedServer ? (
-          <>
-            <ServerDetail server={selectedServer} />
-            {selectedServer.metrics && (
-              <div className="mt-4 rounded-lg border border-dashed border-gray-700 bg-gray-800/50 p-4 text-sm">
-                <h4 className="mb-2 font-bold text-yellow-500">
-                  Agent Uninstallation
-                </h4>
-                <p className="text-gray-400">
-                  To completely remove the monitoring agent from this server,
-                  run the following commands on your server:
-                </p>
-                <div className="mt-3 space-y-1">
-                  <code className="block w-full rounded bg-gray-900 p-2 text-center text-red-400">
-                    docker stop jery-agent
-                  </code>
-                  <code className="block w-full rounded bg-gray-900 p-2 text-center text-red-400">
-                    docker rm jery-agent
-                  </code>
-                  <code className="block w-full rounded bg-gray-900 p-2 text-center text-red-400">
-                    docker rmi romeomanoela/jery-agent:latest
-                  </code>
-                </div>
-              </div>
-            )}
-          </>
+          <ServerDetail server={selectedServer} />
         ) : (
           !loading && (
             <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-gray-600">

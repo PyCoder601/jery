@@ -51,6 +51,22 @@ export const addServer = createAsyncThunk(
   },
 );
 
+export const deleteServer = createAsyncThunk(
+  "account/deleteServer",
+  async (serverId: number, { rejectWithValue }) => {
+    try {
+      await api.delete(`/server/${serverId}`);
+      return serverId;
+    } catch (error) {
+      const errorMessage =
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        error.response?.data?.detail || error.message || "Failed to delete server.";
+      return rejectWithValue(errorMessage);
+    }
+  },
+);
+
 export const killProcess = createAsyncThunk(
   "account/killProcess",
   async ({ serverId, pid }: { serverId: number; pid: number }, { rejectWithValue }) => {
@@ -167,6 +183,12 @@ const accountSlice = createSlice({
       })
       .addCase(addServer.rejected, (state, action) => {
         state.error = action.payload as string;
+      })
+      .addCase(deleteServer.fulfilled, (state, action) => {
+        state.servers = state.servers.filter((s) => s.id !== action.payload);
+        if (state.selectedServer?.id === action.payload) {
+          state.selectedServer = null;
+        }
       })
       .addCase(killProcess.rejected, (state, action) => {
         state.error = action.payload as string;

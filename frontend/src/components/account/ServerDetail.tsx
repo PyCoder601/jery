@@ -65,13 +65,31 @@ const ServerDetail: React.FC<ServerDetailProps> = ({ server }) => {
                   unit={unit}
                 />
               );
-            })}
+          </div>
+
+          <div className="mt-6 rounded-lg border border-dashed border-gray-700 bg-gray-800/50 p-4 text-sm">
+            <h4 className="mb-2 font-bold text-yellow-500">Agent Uninstallation</h4>
+            <p className="text-gray-400">
+              To completely remove the monitoring agent from this server, run the
+              following commands on your server:
+            </p>
+            <div className="mt-3 space-y-1">
+              <code className="block w-full rounded bg-gray-900 p-2 text-center text-red-400">
+                docker stop jery-agent
+              </code>
+              <code className="block w-full rounded bg-gray-900 p-2 text-center text-red-400">
+                docker rm jery-agent
+              </code>
+              <code className="block w-full rounded bg-gray-900 p-2 text-center text-red-400">
+                docker rmi romeomanoela/jery-agent:latest
+              </code>
+            </div>
           </div>
         </div>
       ) : (
         <div className="rounded-lg border border-yellow-600 bg-yellow-900/20 p-4">
           <h3 className="mb-3 font-mono text-lg text-yellow-300">
-            Activation du serveur requise
+            Activation is required
           </h3>
           <div>
             <p className="mb-3 text-sm text-yellow-100">
