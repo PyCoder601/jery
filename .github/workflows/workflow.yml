@@ -27,9 +27,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /root/romeo
+            cd /root/romeo/jery
             echo "${{ secrets.BACKEND_ENV }}" > backend/.env
             cd backend
-            alembic upgrade head
             docker compose down
             docker compose up --build -d
