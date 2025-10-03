@@ -32,7 +32,7 @@ export default function LoginPage() {
   useEffect(() => {
     dispatch(clearHistory());
     dispatch(addHistory(addHistoryLine("Starting login process...")));
-    dispatch(addHistory(addHistoryLine("Enter your email or username:")));
+    dispatch(addHistory(addHistoryLine("Enter your username:")));
   }, [dispatch]);
 
   useEffect(() => {

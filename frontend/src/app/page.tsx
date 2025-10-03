@@ -15,7 +15,7 @@ import { AppDispatch } from "@/redux/store";
 import { addHistoryLine } from "@/utils/helpes";
 
 const JeryAscii = () => (
-  <pre className="mb-4 text-lg font-bold select-none">
+  <pre className="mb-4 text-2xl font-bold select-none">
     <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
       {`
       ██╗███████╗██████╗ ██╗   ██╗
@@ -47,7 +47,7 @@ const Footer = () => (
   <div className="p-4 text-left text-xs text-gray-500">
     <p className="mb-2">
       <a
-        href="https://github.com/your-repo"
+        href="https://github.com/PyCoder601/jery"
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center hover:text-gray-400"
@@ -61,7 +61,7 @@ const Footer = () => (
 
 const lines = [
   { text: "Booting Jery Monitoring System...", delay: 100 },
-  { text: "Version: 1.0.0-beta", delay: 150 },
+  { text: "Version: 0.0.9", delay: 150 },
   { text: "Status: Connected to server.", delay: 200 },
 ];
 
