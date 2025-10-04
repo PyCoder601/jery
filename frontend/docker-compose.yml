@@ -1,0 +1,9 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jery-frontend
+    image: jery-frontend:latest
+    ports:
+      - "3000:3000"
