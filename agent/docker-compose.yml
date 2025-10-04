@@ -1,0 +1,13 @@
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jery-agent
+    network_mode: host
+    pid: host
+    image: jery-agent:latest
+    env_file:
+      - .env
+    environment:
+      - API_KEY=${API_KEY}

@@ -8,10 +8,6 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 COPY main.py .
-
-# docker run -e API_KEY="votre_clé"
-ENV API_KEY=""
 
 CMD ["python", "main.py"]
