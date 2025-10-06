@@ -40,7 +40,7 @@ The project is composed of three main components that work together:
 - **Backend:**
   - [Python](https://www.python.org/)
   - [FastAPI](https://fastapi.tiangolo.com/)
-  - [SQLAlchemy](https://www.sqlalchemy.org/)
+  - [SQLModel](https://sqlmodel.tiangolo.com/)
   - [Alembic](https://alembic.sqlalchemy.org/)
   - [Docker](https://www.docker.com/)
 
