@@ -17,7 +17,7 @@ Jery is a full-stack application designed to provide real-time monitoring of you
 The project is composed of three main components that work together:
 
 1.  **Frontend:** A **Next.js (React)** single-page application that provides the user interface. It communicates with the backend via a REST API for data retrieval and a WebSocket connection for real-time updates.
-2.  **Backend:** A **Python (FastAPI)** server that acts as the central hub. It handles user authentication, stores data in a database, and manages communication between the frontend and the agents.
+2.  **Backend:** A **FastAPI (Python)** server that acts as the central hub. It handles user authentication, stores data in a database, and manages communication between the frontend and the agents.
 3.  **Agent:** A lightweight **Python** script that runs on each monitored server. It collects system metrics and sends them periodically to the backend for processing.
 
 ```
