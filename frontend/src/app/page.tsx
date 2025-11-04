@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Github } from "lucide-react";
+import { Shield, Zap, Activity } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,9 +15,15 @@ import { AppDispatch } from "@/redux/store";
 import { addHistoryLine } from "@/utils/helpes";
 
 const JeryAscii = () => (
-  <pre className="mb-4 text-2xl font-bold select-none">
-    <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-      {`
+  <motion.div
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6 }}
+    className="mb-6"
+  >
+    <pre className="text-2xl leading-tight font-bold select-none">
+      <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+        {`
       ██╗███████╗██████╗ ██╗   ██╗
       ██║██╔════╝██╔══██╗╚██╗ ██╔╝
       ██║█████╗  ██████╔╝ ╚████╔╝ 
@@ -25,44 +31,51 @@ const JeryAscii = () => (
 ╚██████╔╝███████╗██║  ██║   ██║   
  ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   
 `}
-    </span>
-  </pre>
+      </span>
+    </pre>
+    <motion.p
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.3, duration: 0.5 }}
+      className="-mt-2 mb-4 text-center text-sm text-gray-400"
+    >
+      Professional Server Monitoring & Management
+    </motion.p>
+  </motion.div>
 );
 
-const WelcomeText = () => (
-  <div className="mb-4 text-gray-300">
-    <p className="mb-2 font-bold">Tips for getting started:</p>
-    <ul className="list-inside list-disc">
-      <li>
-        Type <code className="text-red-400">signup</code> to create a new account.
-      </li>
-      <li>
-        Type <code className="text-red-400">login</code> if you already have an account.
-      </li>
-    </ul>
-  </div>
-);
-
-const Footer = () => (
-  <div className="p-4 text-left text-xs text-gray-500">
-    <p className="mb-2">
-      <a
-        href="https://github.com/PyCoder601/jery"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center hover:text-gray-400"
-      >
-        <Github className="mr-2 h-4 w-4" />
-        GitHub Repository
-      </a>
-    </p>
-  </div>
+const FeatureCard = ({
+  icon: Icon,
+  title,
+  description,
+  delay,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  delay: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ delay, duration: 0.4 }}
+    className="flex items-start gap-3 rounded-lg border border-gray-700/50 bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 transition-all hover:border-blue-500/50"
+  >
+    <div className="rounded-md bg-blue-500/10 p-2 text-blue-400">
+      <Icon className="h-4 w-4" />
+    </div>
+    <div>
+      <h3 className="text-sm font-semibold text-gray-200">{title}</h3>
+      <p className="mt-1 text-xs text-gray-400">{description}</p>
+    </div>
+  </motion.div>
 );
 
 const lines = [
-  { text: "Booting Jery Monitoring System...", delay: 100 },
-  { text: "Version: 0.0.9", delay: 150 },
-  { text: "Status: Connected to server.", delay: 200 },
+  { text: "🚀 Initializing Jery Monitoring System...", delay: 100 },
+  { text: "📦 Version: 0.0.9 | Build: Production", delay: 150 },
+  { text: "✓ Status: Connected to server.", delay: 200 },
+  { text: "✓ All systems operational.", delay: 250 },
 ];
 
 export default function Home() {
@@ -123,7 +136,7 @@ export default function Home() {
     return parts.map((part, i) => {
       if (wordsToColor.includes(part)) {
         return (
-          <span key={i} className="text-red-500">
+          <span key={i} className="font-semibold text-cyan-400">
             {part}
           </span>
         );
@@ -133,28 +146,27 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-full flex-col font-mono text-sm text-green-400">
+    <div className="flex h-full flex-col font-mono text-sm">
       <div className="flex-grow overflow-y-auto pr-2">
         <JeryAscii />
-        <WelcomeText />
-        <Footer />
         {history.map((line, index) => (
           <motion.p
             key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.1 }}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2 }}
+            className="mb-1"
           >
             {line.isUserInput ? (
-              <>
-                <span className="mr-2 text-gray-400">{`>`}</span>
-                <span>{line.text}</span>
-              </>
+              <span className="flex items-center gap-2">
+                <span className="font-bold text-blue-400">❯</span>
+                <span className="text-gray-200">{line.text}</span>
+              </span>
             ) : (
-              <>
-                <span className="mr-2 text-gray-400">{`[${line.timestamp}]>`}</span>
-                {colorizeText(line.text)}
-              </>
+              <span className="flex items-start gap-2">
+                <span className="mt-0.5 text-xs text-gray-500">[{line.timestamp}]</span>
+                <span className="text-gray-300">{colorizeText(line.text)}</span>
+              </span>
             )}
           </motion.p>
         ))}
