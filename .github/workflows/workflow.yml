@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASS }}
           source: "./backend/"
-          target: "/root/romeo/jery"
+          target: "/home/ubuntu/jery"
 
       - name: SSH and deploy
         uses: appleboy/ssh-action@master
@@ -27,7 +27,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /root/romeo/jery
+            cd /home/ubuntu/jery
             echo "${{ secrets.BACKEND_ENV }}" > backend/.env
             cd backend
             docker compose down
