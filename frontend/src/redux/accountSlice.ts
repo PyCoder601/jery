@@ -1,7 +1,13 @@
 "use client";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  PayloadAction,
+  createSelector,
+} from "@reduxjs/toolkit";
 import { Metric, Server, UserData } from "@/utils/types";
 import api from "@/services/api";
+import type { RootState } from "./store";
 
 interface AccountState {
   user: UserData | null;
@@ -198,4 +204,26 @@ const accountSlice = createSlice({
 
 export const { selectServer, setUser, updateMetrics, updateServerStatus } =
   accountSlice.actions;
+
 export default accountSlice.reducer;
+
+// Sélecteurs de base
+export const selectUser = (state: RootState) => state.account.user;
+export const selectServers = (state: RootState) => state.account.servers;
+export const selectSelectedServer = (state: RootState) => state.account.selectedServer;
+export const selectLoading = (state: RootState) => state.account.loading;
+export const selectError = (state: RootState) => state.account.error;
+
+// Sélecteurs mémoïsés avec createSelector
+export const selectVerifiedServers = createSelector([selectServers], (servers) =>
+  servers.filter((server) => server.is_verified),
+);
+
+export const selectUnverifiedServers = createSelector([selectServers], (servers) =>
+  servers.filter((server) => !server.is_verified),
+);
+
+export const selectServerById = createSelector(
+  [selectServers, (_state: RootState, serverId: number) => serverId],
+  (servers, serverId) => servers.find((server) => server.id === serverId),
+);

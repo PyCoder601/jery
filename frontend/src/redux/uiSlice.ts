@@ -1,6 +1,7 @@
 "use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { HistoryLine, UiState } from "@/utils/types";
+import type { RootState } from "./store";
 
 const initialState: UiState = {
   inputValue: "",
@@ -16,7 +17,6 @@ const uiSlice = createSlice({
       state.inputValue = action.payload;
     },
     setCommand: (state, action: PayloadAction<string>) => {
-
       state.command.text = action.payload;
     },
     clearCommand: (state) => {
@@ -42,8 +42,10 @@ export const {
   clearHistory,
   setCommandType,
 } = uiSlice.actions;
+
 export default uiSlice.reducer;
 
-export const selectInputValue = (state: { ui: UiState }) => state.ui.inputValue;
-export const selectCommand = (state: { ui: UiState }) => state.ui.command;
-export const selectHistory = (state: { ui: UiState }) => state.ui.history;
+// Sélecteurs modernes typés avec RootState
+export const selectInputValue = (state: RootState) => state.ui.inputValue;
+export const selectCommand = (state: RootState) => state.ui.command;
+export const selectHistory = (state: RootState) => state.ui.history;

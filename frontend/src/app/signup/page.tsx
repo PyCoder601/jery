@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   addHistory,
   clearCommand,
@@ -9,16 +9,15 @@ import {
   selectHistory,
   setCommandType,
 } from "@/redux/uiSlice";
-import { AppDispatch } from "@/redux/store";
 import { UserSignupData } from "@/utils/types";
 import { addHistoryLine } from "@/utils/helpes";
 import { authenticate, checkEmail, checkUsername } from "@/services/auth";
 import AuthHistories from "@/components/AuthHistories";
 
 export default function SignupPage() {
-  const dispatch: AppDispatch = useDispatch();
-  const command = useSelector(selectCommand);
-  const history = useSelector(selectHistory);
+  const dispatch = useAppDispatch();
+  const command = useAppSelector(selectCommand);
+  const history = useAppSelector(selectHistory);
 
   const [workflow, setWorkflow] = useState<{
     step: string;

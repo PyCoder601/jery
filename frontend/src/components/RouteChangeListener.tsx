@@ -2,13 +2,12 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "@/redux/hooks";
 import { clearHistory } from "@/redux/uiSlice";
-import { AppDispatch } from "@/redux/store";
 
 export default function RouteChangeListener() {
   const pathname = usePathname();
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(clearHistory());

@@ -2,8 +2,7 @@
 import React from "react";
 import { Cpu, MemoryStick, Terminal, XCircle } from "lucide-react";
 import { Server, TopProcess } from "@/utils/types";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
+import { useAppDispatch } from "@/redux/hooks";
 import { killProcess } from "@/redux/accountSlice";
 import { motion } from "framer-motion";
 
@@ -12,7 +11,7 @@ interface ProcessSidebarProps {
 }
 
 const ProcessSidebar: React.FC<ProcessSidebarProps> = ({ server }) => {
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const processes: TopProcess[] = server.top_five_processes
     ? JSON.parse(server.top_five_processes)
     : [];
@@ -45,15 +44,11 @@ const ProcessSidebar: React.FC<ProcessSidebarProps> = ({ server }) => {
                 <div className="flex shrink-0 items-center">
                   <div className="mr-3 flex items-center" title="CPU Usage">
                     <Cpu size={12} className="mr-1 text-gray-500" />
-                    <span className="text-green-300">
-                      {p.cpu_percent.toFixed(1)}%
-                    </span>
+                    <span className="text-green-300">{p.cpu_percent.toFixed(1)}%</span>
                   </div>
                   <div className="mr-2 flex items-center" title="Memory Usage">
                     <MemoryStick size={12} className="mr-1 text-gray-500" />
-                    <span className="text-blue-300">
-                      {p.memory_percent.toFixed(1)}%
-                    </span>
+                    <span className="text-blue-300">{p.memory_percent.toFixed(1)}%</span>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.2, color: "#ef4444" }}

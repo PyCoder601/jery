@@ -1,9 +1,8 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Shield, Zap, Activity } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   addHistory,
   clearCommand,
@@ -11,7 +10,6 @@ import {
   selectCommand,
   selectHistory,
 } from "@/redux/uiSlice";
-import { AppDispatch } from "@/redux/store";
 import { addHistoryLine } from "@/utils/helpes";
 
 const JeryAscii = () => (
@@ -44,33 +42,6 @@ const JeryAscii = () => (
   </motion.div>
 );
 
-const FeatureCard = ({
-  icon: Icon,
-  title,
-  description,
-  delay,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  delay: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, x: -20 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ delay, duration: 0.4 }}
-    className="flex items-start gap-3 rounded-lg border border-gray-700/50 bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 transition-all hover:border-blue-500/50"
-  >
-    <div className="rounded-md bg-blue-500/10 p-2 text-blue-400">
-      <Icon className="h-4 w-4" />
-    </div>
-    <div>
-      <h3 className="text-sm font-semibold text-gray-200">{title}</h3>
-      <p className="mt-1 text-xs text-gray-400">{description}</p>
-    </div>
-  </motion.div>
-);
-
 const lines = [
   { text: "🚀 Initializing Jery Monitoring System...", delay: 100 },
   { text: "📦 Version: 0.0.9 | Build: Production", delay: 150 },
@@ -79,9 +50,9 @@ const lines = [
 ];
 
 export default function Home() {
-  const dispatch: AppDispatch = useDispatch();
-  const command = useSelector(selectCommand);
-  const history = useSelector(selectHistory);
+  const dispatch = useAppDispatch();
+  const command = useAppSelector(selectCommand);
+  const history = useAppSelector(selectHistory);
   const router = useRouter();
   const terminalEndRef = useRef<HTMLDivElement>(null);
 

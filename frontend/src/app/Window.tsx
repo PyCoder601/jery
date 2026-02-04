@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   selectInputValue,
   setCommand,
@@ -9,7 +9,6 @@ import {
   addHistory,
   selectCommand,
 } from "@/redux/uiSlice";
-import { AppDispatch } from "@/redux/store";
 import { addHistoryLine } from "@/utils/helpes";
 import { Github, Star } from "lucide-react";
 
@@ -55,9 +54,9 @@ const GitHubBadge = () => {
 };
 
 const Window = ({ children }: { children: React.ReactNode }) => {
-  const inputValue: string = useSelector(selectInputValue);
-  const curr_command = useSelector(selectCommand);
-  const dispatch: AppDispatch = useDispatch();
+  const inputValue = useAppSelector(selectInputValue);
+  const curr_command = useAppSelector(selectCommand);
+  const dispatch = useAppDispatch();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {

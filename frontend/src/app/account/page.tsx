@@ -1,8 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
-import { addServer, deleteServer, fetchServers, selectServer } from "@/redux/accountSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  addServer,
+  deleteServer,
+  fetchServers,
+  selectServer,
+  selectServers,
+  selectSelectedServer,
+  selectLoading,
+  selectError,
+} from "@/redux/accountSlice";
 import ServerList from "@/components/account/ServerList";
 import ServerDetail from "@/components/account/ServerDetail";
 import ProcessSidebar from "@/components/account/ProcessSidebar";
@@ -18,12 +26,13 @@ import { addHistoryLine } from "@/utils/helpes";
 import { initWebSocket, closeWebSocket } from "@/services/webSocketService";
 
 const AccountPage = () => {
-  const dispatch: AppDispatch = useDispatch();
-  const { servers, selectedServer, loading, error } = useSelector(
-    (state: RootState) => state.account,
-  );
-  const command = useSelector(selectCommand);
-  const history = useSelector(selectHistory);
+  const dispatch = useAppDispatch();
+  const servers = useAppSelector(selectServers);
+  const selectedServer = useAppSelector(selectSelectedServer);
+  const loading = useAppSelector(selectLoading);
+  const error = useAppSelector(selectError);
+  const command = useAppSelector(selectCommand);
+  const history = useAppSelector(selectHistory);
 
   const [commandStep, setCommandStep] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);

@@ -41,5 +41,8 @@ export const store = configureStore({
 });
 
 export const persistor: Persistor = persistStore(store);
+
+// Types inférés du store
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export type AppStore = typeof store;
