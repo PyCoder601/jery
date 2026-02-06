@@ -39,15 +39,15 @@ const RobotGuide = () => {
     switch (pathname) {
       case "/login":
         setMessage(
-          "If you don't have an account, you can use the `/signup` command to create one.",
+          "If you don't have an account, you can use the `/signup` command to create one. Use `clear` or Ctrl+L to clear the terminal.",
         );
-        setSuggestions(["/signup"]);
+        setSuggestions(["/signup", "clear"]);
         break;
       case "/signup":
         setMessage(
-          "If you already have an account, you can use the `/login` command to sign in.",
+          "If you already have an account, you can use the `/login` command to sign in. Use `clear` or Ctrl+L to clear the terminal.",
         );
-        setSuggestions(["/login"]);
+        setSuggestions(["/login", "clear"]);
         break;
       case "/account":
         setMessage(
@@ -56,9 +56,7 @@ const RobotGuide = () => {
         setSuggestions(["add-server", "delete-server", "logout"]);
         break;
       default:
-        setMessage(
-          "Not sure where to start? Try one of these commands in the terminal:",
-        );
+        setMessage("Not sure where to start? Try one of these commands in the terminal:");
         setSuggestions(["signup", "login"]);
         break;
     }

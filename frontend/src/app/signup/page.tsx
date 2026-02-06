@@ -34,8 +34,34 @@ export default function SignupPage() {
     dispatch(addHistory(addHistoryLine("Enter your email address:")));
   }, [dispatch]);
 
+  // Gérer le raccourci Ctrl+L pour clear
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "l") {
+        e.preventDefault();
+        dispatch(clearHistory());
+        dispatch(setCommandType("text"));
+        dispatch(addHistory(addHistoryLine("Starting account creation...")));
+        dispatch(addHistory(addHistoryLine("Enter your email address:")));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [dispatch]);
+
   useEffect(() => {
     if (!command?.text) return;
+
+    // Commande clear
+    if (command.text.toLowerCase().trim() === "clear") {
+      dispatch(clearHistory());
+      dispatch(clearCommand());
+      dispatch(setCommandType("text"));
+      dispatch(addHistory(addHistoryLine("Starting account creation...")));
+      dispatch(addHistory(addHistoryLine("Enter your email address:")));
+      return;
+    }
 
     if (command.text === "/login") {
       dispatch(addHistory(addHistoryLine("Redirecting to login...")));
