@@ -30,5 +30,4 @@ jobs:
             cd /home/ubuntu/jery
             echo "${{ secrets.BACKEND_ENV }}" > backend/.env
             cd backend
-            docker compose down
-            docker compose up --build -d
+            docker compose up --build -d --remove-orphans
