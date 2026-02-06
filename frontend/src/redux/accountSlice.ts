@@ -1,94 +1,118 @@
 "use client";
-import {
-  createAsyncThunk,
-  createSlice,
-  PayloadAction,
-  createSelector,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Metric, Server, UserData } from "@/utils/types";
 import api from "@/services/api";
 import type { RootState } from "./store";
 
+// Types
 interface AccountState {
   user: UserData | null;
   servers: Server[];
   selectedServer: Server | null;
   loading: boolean;
   error: string | null;
+  operationLoading: {
+    fetchServers: boolean;
+    addServer: boolean;
+    deleteServer: boolean;
+    killProcess: boolean;
+  };
 }
 
+interface SerializedError {
+  message: string;
+  code?: string;
+}
+
+// État initial
 const initialState: AccountState = {
   user: null,
   servers: [],
   selectedServer: null,
   loading: false,
   error: null,
+  operationLoading: {
+    fetchServers: false,
+    addServer: false,
+    deleteServer: false,
+    killProcess: false,
+  },
 };
 
-export const fetchServers = createAsyncThunk(
-  "account/fetchServers",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await api.get("/servers");
-      return response.data as Server[];
-    } catch (error) {
-      const errorMessage =
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        error.response?.data?.detail || error.message || "Failed to fetch servers.";
-      return rejectWithValue(errorMessage);
-    }
-  },
-);
+// Helper pour extraire les messages d'erreur
+const getErrorMessage = (error: unknown): string => {
+  if (typeof error === "string") return error;
+  if (error instanceof Error) return error.message;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if ((error as any)?.response?.data?.detail) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (error as any).response.data.detail;
+  }
+  return "Une erreur inattendue s'est produite";
+};
 
-export const addServer = createAsyncThunk(
-  "account/addServer",
-  async (name: string, { rejectWithValue }) => {
-    try {
-      const response = await api.post("/server", { name });
-      return response.data as Server;
-    } catch (error) {
-      const errorMessage =
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        error.response?.data?.detail || error.message || "Failed to add server.";
-      return rejectWithValue(errorMessage);
-    }
-  },
-);
+// Thunks async
+export const fetchServers = createAsyncThunk<
+  Server[],
+  void,
+  { rejectValue: SerializedError }
+>("account/fetchServers", async (_, { rejectWithValue }) => {
+  try {
+    const response = await api.get("/servers");
+    return response.data as Server[];
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error),
+    });
+  }
+});
 
-export const deleteServer = createAsyncThunk(
-  "account/deleteServer",
-  async (serverId: number, { rejectWithValue }) => {
-    try {
-      await api.delete(`/server/${serverId}`);
-      return serverId;
-    } catch (error) {
-      const errorMessage =
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        error.response?.data?.detail || error.message || "Failed to delete server.";
-      return rejectWithValue(errorMessage);
-    }
-  },
-);
+export const addServer = createAsyncThunk<
+  Server,
+  string,
+  { rejectValue: SerializedError }
+>("account/addServer", async (name, { rejectWithValue }) => {
+  try {
+    const response = await api.post("/server", { name });
+    return response.data as Server;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error),
+    });
+  }
+});
 
-export const killProcess = createAsyncThunk(
-  "account/killProcess",
-  async ({ serverId, pid }: { serverId: number; pid: number }, { rejectWithValue }) => {
-    try {
-      await api.post(`/server/${serverId}/kill-process`, { pid });
-      return { serverId, pid }; // Return serverId and pid for potential UI updates
-    } catch (error) {
-      const errorMessage =
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        error.response?.data?.detail || error.message || "Failed to kill process.";
-      return rejectWithValue(errorMessage);
-    }
-  },
-);
+export const deleteServer = createAsyncThunk<
+  number,
+  number,
+  { rejectValue: SerializedError }
+>("account/deleteServer", async (serverId, { rejectWithValue }) => {
+  try {
+    await api.delete(`/server/${serverId}`);
+    return serverId;
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error),
+    });
+  }
+});
 
+export const killProcess = createAsyncThunk<
+  { serverId: number; pid: number },
+  { serverId: number; pid: number },
+  { rejectValue: SerializedError }
+>("account/killProcess", async ({ serverId, pid }, { rejectWithValue }) => {
+  try {
+    await api.post(`/server/${serverId}/kill-process`, { pid });
+    return { serverId, pid };
+  } catch (error) {
+    return rejectWithValue({
+      message: getErrorMessage(error),
+    });
+  }
+});
+
+// Slice
 const accountSlice = createSlice({
   name: "account",
   initialState,
@@ -98,6 +122,12 @@ const accountSlice = createSlice({
     },
     setUser: (state, action: PayloadAction<UserData>) => {
       state.user = action.payload;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.servers = [];
+      state.selectedServer = null;
+      state.error = null;
     },
     updateMetrics: (
       state,
@@ -165,16 +195,15 @@ const accountSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // Fetch servers
     builder
       .addCase(fetchServers.pending, (state) => {
+        state.operationLoading.fetchServers = true;
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchServers.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      .addCase(fetchServers.fulfilled, (state, action: PayloadAction<Server[]>) => {
+      .addCase(fetchServers.fulfilled, (state, action) => {
+        state.operationLoading.fetchServers = false;
         state.loading = false;
         state.servers = action.payload.map((server) => ({
           ...server,
@@ -184,46 +213,69 @@ const accountSlice = createSlice({
           })),
         }));
       })
+      .addCase(fetchServers.rejected, (state, action) => {
+        state.operationLoading.fetchServers = false;
+        state.loading = false;
+        state.error = action.payload?.message || "Échec du chargement des serveurs";
+      })
+      // Add server
+      .addCase(addServer.pending, (state) => {
+        state.operationLoading.addServer = true;
+        state.error = null;
+      })
       .addCase(addServer.fulfilled, (state, action) => {
-        state.servers.push(action.payload);
+        state.operationLoading.addServer = false;
+        state.servers.push({
+          ...action.payload,
+          metrics: action.payload.metrics.map((metric) => ({
+            ...metric,
+            history: [],
+          })),
+        });
       })
       .addCase(addServer.rejected, (state, action) => {
-        state.error = action.payload as string;
+        state.operationLoading.addServer = false;
+        state.error = action.payload?.message || "Échec de l'ajout du serveur";
+      })
+      // Delete server
+      .addCase(deleteServer.pending, (state) => {
+        state.operationLoading.deleteServer = true;
+        state.error = null;
       })
       .addCase(deleteServer.fulfilled, (state, action) => {
+        state.operationLoading.deleteServer = false;
         state.servers = state.servers.filter((s) => s.id !== action.payload);
         if (state.selectedServer?.id === action.payload) {
           state.selectedServer = null;
         }
       })
+      .addCase(deleteServer.rejected, (state, action) => {
+        state.operationLoading.deleteServer = false;
+        state.error = action.payload?.message || "Échec de la suppression du serveur";
+      })
+      // Kill process
+      .addCase(killProcess.pending, (state) => {
+        state.operationLoading.killProcess = true;
+        state.error = null;
+      })
+      .addCase(killProcess.fulfilled, (state) => {
+        state.operationLoading.killProcess = false;
+      })
       .addCase(killProcess.rejected, (state, action) => {
-        state.error = action.payload as string;
+        state.operationLoading.killProcess = false;
+        state.error = action.payload?.message || "Échec de l'arrêt du processus";
       });
   },
 });
 
-export const { selectServer, setUser, updateMetrics, updateServerStatus } =
+// Actions
+export const { selectServer, setUser, updateMetrics, updateServerStatus, logout } =
   accountSlice.actions;
 
 export default accountSlice.reducer;
 
 // Sélecteurs de base
-export const selectUser = (state: RootState) => state.account.user;
 export const selectServers = (state: RootState) => state.account.servers;
 export const selectSelectedServer = (state: RootState) => state.account.selectedServer;
 export const selectLoading = (state: RootState) => state.account.loading;
 export const selectError = (state: RootState) => state.account.error;
-
-// Sélecteurs mémoïsés avec createSelector
-export const selectVerifiedServers = createSelector([selectServers], (servers) =>
-  servers.filter((server) => server.is_verified),
-);
-
-export const selectUnverifiedServers = createSelector([selectServers], (servers) =>
-  servers.filter((server) => !server.is_verified),
-);
-
-export const selectServerById = createSelector(
-  [selectServers, (_state: RootState, serverId: number) => serverId],
-  (servers, serverId) => servers.find((server) => server.id === serverId),
-);
