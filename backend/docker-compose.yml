@@ -1,8 +1,8 @@
 services:
   db:
-    image: postgres:15-alpine
-    container_name: jery_db_2
-    restart: always
+    image: postgres:16-alpine
+    container_name: jery_db
+    restart: unless-stopped
     env_file:
       - ./.env
     environment:
@@ -23,8 +23,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    container_name: jery_backend_2
-    restart: always
+    container_name: jery_backend
+    restart: unless-stopped
     ports:
       - "8004:8004"
     env_file:
